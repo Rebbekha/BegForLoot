@@ -39,22 +39,22 @@ end
 UserInterface.frame = (function()
   local NUM_LIST_FRAME_BUTTONS = 7
   local OPTIONS_FRAME_WIDTH = 250
-  local TRANSMOG_OPTIONS_FRAME_WIDTH = 280
+  local TRANSMOG_OPTIONS_FRAME_WIDTH = 300
   local TOTAL_FRAME_WIDTH = (
-    Widgets:Padding() +
+    5 +
     OPTIONS_FRAME_WIDTH +
-    Widgets:Padding(0.5) +
+    5 +
     OPTIONS_FRAME_WIDTH +
-    Widgets:Padding(0.5) +
+    5 +
     TRANSMOG_OPTIONS_FRAME_WIDTH +
-    Widgets:Padding() 
+    5 
   )
 
   -- Base frame. (titre)
   local frame = Widgets:Window({
     name = ADDON_NAME .. "_ParentFrame",
     width = TOTAL_FRAME_WIDTH,
-    height = 550,
+    height = 545,
     titleText = Colors.Blue(ADDON_NAME),
   })
   frame:SetFrameStrata("HIGH")
@@ -72,8 +72,8 @@ UserInterface.frame = (function()
     name = "$parent_OptionsFrame",
     parent = frame,
     points = {
-      { "TOPLEFT", frame.titleButton, "BOTTOMLEFT", Widgets:Padding(), 5 }, 
-      { "BOTTOMLEFT", frame, "LEFT", Widgets:Padding(), 45 }
+      { "TOPLEFT", frame.titleButton, "BOTTOMLEFT", 5, 0 }, 
+      { "BOTTOMLEFT", frame, "LEFT", 5, 32 }
     },
     width = OPTIONS_FRAME_WIDTH,
     titleText = L.GLOBAL_OPTIONS_TEXT
@@ -91,8 +91,8 @@ UserInterface.frame = (function()
     name = "$parent_OfferingOptionFrame",
     parent = frame,
     points = {
-      { "TOPLEFT",    frame.optionsFrame, "TOPRIGHT", Widgets:Padding(0.5), 0 },
-      { "BOTTOMLEFT", frame.optionsFrame, "BOTTOMLEFT", Widgets:Padding(0.5), 0 }
+      { "TOPLEFT",    frame.optionsFrame, "TOPRIGHT", 5, 0 },
+      { "BOTTOMLEFT", frame.optionsFrame, "BOTTOMLEFT", 5, 0 }
     },
     width = OPTIONS_FRAME_WIDTH,
     titleText = L.OFFERING_LOOT_OPTIONS_TEXT
@@ -116,8 +116,8 @@ UserInterface.frame = (function()
     name = "$parent_ReceivingOptionFrame",
     parent = frame,
     points = {
-      { "TOPLEFT",    frame.OfferingOptionFrame, "TOPRIGHT", Widgets:Padding(0.5), 0 },
-      { "BOTTOMLEFT", frame.OfferingOptionFrame, "TOPRIGHT", Widgets:Padding(0.5), -75 }
+      { "TOPLEFT",    frame.OfferingOptionFrame, "TOPRIGHT", 5, 0 },
+      { "BOTTOMLEFT", frame.OfferingOptionFrame, "TOPRIGHT", 0, -75 }
     },
     width = TRANSMOG_OPTIONS_FRAME_WIDTH,
     titleText = L.RECEIVING_LOOT_OPTIONS_TEXT
@@ -151,7 +151,7 @@ UserInterface.frame = (function()
     name = "$parent_TransmogOptionFrame",
     parent = frame,
     points = {
-      { "TOPLEFT",    frame.ReceivingOptionFrame,"BOTTOMLEFT", 0, -130},
+      { "TOPLEFT",    frame.ReceivingOptionFrame,"BOTTOMLEFT", 0, -132},
       { "BOTTOMLEFT", frame.ReceivingOptionFrame,"BOTTOMLEFT", 0, 0 }
     },
     width = TRANSMOG_OPTIONS_FRAME_WIDTH,
@@ -229,7 +229,7 @@ UserInterface.frame = (function()
     parent = frame,
     points = {
       { "TOPLEFT", frame.optionsFrame, "BOTTOMLEFT", 0, -5}, -- Positionnement de la frame
-      { "BOTTOMRIGHT", frame, "BOTTOMRIGHT", -10, 15}
+      { "BOTTOMRIGHT", frame, "BOTTOMRIGHT", -6, 5}
     },
     width = TOTAL_FRAME_WIDTH - 20, -- Largeur de la frame
     titleText = L.WHISPER_TEXT, -- Texte du titre
