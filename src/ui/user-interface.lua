@@ -57,7 +57,8 @@ UserInterface.frame = (function()
     height = 550,
     titleText = Colors.Blue(ADDON_NAME),
   })
-  frame:SetFrameStrata("LOW")
+  frame:SetFrameStrata("HIGH")
+  frame:SetFrameLevel(1)
   -- Version text.
   frame.versionText = frame.titleButton:CreateFontString("$parent_VersionText", "ARTWORK", "GameFontNormalSmall")
   frame.versionText:SetPoint("CENTER")
@@ -227,13 +228,14 @@ UserInterface.frame = (function()
     name = "$parent_GlobalWhisperFrame",
     parent = frame,
     points = {
-      { "TOPLEFT", frame.optionsFrame, "BOTTOMLEFT", 0, 0}, -- Positionnement de la frame
+      { "TOPLEFT", frame.optionsFrame, "BOTTOMLEFT", 0, 5}, -- Positionnement de la frame
       { "BOTTOMRIGHT", frame, "BOTTOMRIGHT", -10, 10}
     },
     width = TOTAL_FRAME_WIDTH - 20, -- Largeur de la frame
     titleText = L.WHISPER_TEXT, -- Texte du titre
   })
-  frame.GlobalWhisperFrame:SetFrameStrata("MEDIUM") -- Définir la strata de la frame
+  frame.GlobalWhisperFrame:SetFrameStrata("PARENT") -- Définir la strata de la frame
+  frame.GlobalWhisperFrame:SetFrameLevel(2)
 
   -- Définir les informations de backdrop nécessaires dans toutes les frames Whisper
   local backdropInfo = {
@@ -264,7 +266,8 @@ UserInterface.frame = (function()
     titleText = L.WHISPER_TEXT .. "1", -- Texte du titre avec le numéro 1
   })
 
-  frame.Whisper1:SetFrameStrata("HIGH") -- Définir la strata de la frame
+  frame.Whisper1:SetFrameStrata("PARENT") -- Définir la strata de la frame
+  frame.Whisper1:SetFrameLevel(3)
 
   -- Create and position the title text for Whisper 1
   frame.Whisper1.Titletext = frame.Whisper1:CreateFontString(nil, "ARTWORK", "GameFontNormal")
@@ -337,7 +340,8 @@ UserInterface.frame = (function()
     width = TOTAL_FRAME_WIDTH/3-10,
     titleText = L.WHISPER_TEXT .. "2",
   })  
-  frame.Whisper2:SetFrameStrata("HIGH")
+  frame.Whisper2:SetFrameStrata("PARENT")
+  frame.Whisper2:SetFrameLevel(3)
   
   -- Create and position the title text for Whisper 2
   frame.Whisper2.Titletext = frame.Whisper2:CreateFontString(nil, "ARTWORK", "GameFontNormal")
@@ -410,7 +414,8 @@ UserInterface.frame = (function()
       width = TOTAL_FRAME_WIDTH/3-10,
       titleText = L.WHISPER_TEXT .. "3",
     })  
-	frame.Whisper3:SetFrameStrata("HIGH")
+  frame.Whisper3:SetFrameStrata("PARENT")
+  frame.Whisper3:SetFrameLevel(3)
 
   -- Create and position the title text for Whisper 3
   frame.Whisper3.Titletext = frame.Whisper3:CreateFontString(nil, "ARTWORK", "GameFontNormal")
