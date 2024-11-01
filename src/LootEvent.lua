@@ -44,7 +44,7 @@ local FII_HAS_INDESTRUCTIBLE		= 'HAS_INDESTRUCTIBLE'			-- true if the item has i
 local FII_HAS_LEECH					= 'HAS_LEECH'					-- true if the item has leech
 local FII_HAS_SPEED					= 'HAS_SPEED'					-- true if the item has speed
 local FII_XMOGGABLE					= 'XMOGGABLE'					-- true if the player needs this item for xmog
-
+local FII_IS_BOUND_TO_ACCOUNT		= "IS_BOUND_TO_ACCOUNT"			-- true if the item is bound at account/warband
 
 -- Localization-independent class names
 
@@ -413,105 +413,110 @@ debugLootEvent = false
     return ilvl
   end
 
-  local function GetFullItemInfo(item)
-    local ITEM_CLASSES_ALLOWED_PATTERN                  = _G.ITEM_CLASSES_ALLOWED:gsub('%%s', '(.+)')    -- Classes: (.+)
-    local BIND_TRADE_TIME_REMAINING_PATTERN             = _G.BIND_TRADE_TIME_REMAINING:gsub('%%s', '(.+)')  -- You may trade this item with players that were also eligible to loot this item for the next (.+).
-    local TRANSMOGRIFY_TOOLTIP_APPEARANCE_UNKNOWN_PATTERN         = _G.TRANSMOGRIFY_TOOLTIP_APPEARANCE_UNKNOWN:gsub('%%s', '(.+)')      -- You haven't collected this appearance. You can already know the appearance from another item
-    
-    
+local function GetFullItemInfo(item)
+    local ITEM_CLASSES_ALLOWED_PATTERN = _G.ITEM_CLASSES_ALLOWED:gsub('%%s', '(.+)')
+    local BIND_TRADE_TIME_REMAINING_PATTERN = _G.BIND_TRADE_TIME_REMAINING:gsub('%%s', '(.+)')
+    local TRANSMOGRIFY_TOOLTIP_APPEARANCE_UNKNOWN_PATTERN = _G.TRANSMOGRIFY_TOOLTIP_APPEARANCE_UNKNOWN:gsub('%%s', '(.+)')
+
+    -- Modèles pour les objets liés au compte et au bataillon
+    local ITEM_BIND_TO_ACCOUNT_PATTERN = _G.ITEM_BIND_TO_ACCOUNT:gsub('%%s', '(.+)')
+    local ITEM_BIND_TO_ACCOUNT_UNTIL_EQUIP_PATTERN = _G.ITEM_BIND_TO_ACCOUNT_UNTIL_EQUIP:gsub('%%s', '(.+)')
+    local ITEM_BIND_TO_BNETACCOUNT_PATTERN = _G.ITEM_BIND_TO_BNETACCOUNT:gsub('%%s', '(.+)')
+    local ITEM_BNETACCOUNTBOUND_PATTERN = _G.ITEM_BNETACCOUNTBOUND:gsub('%%s', '(.+)')
+
     local fullItemInfo = {}
 
     if item ~= nil then
-      fullItemInfo[FII_ITEM] = item
-      
-      -- determine the basic values from the Blizzard GetItemInfo() API call
-      _, _, fullItemInfo[FII_QUALITY], fullItemInfo[FII_BASE_ILVL], fullItemInfo[FII_REQUIRED_LEVEL],fullItemInfo[FII_TYPE], fullItemInfo[FII_SUB_TYPE], _, fullItemInfo[FII_ITEM_EQUIP_LOC], _, _, fullItemInfo[FII_CLASS], fullItemInfo[FII_SUB_CLASS], fullItemInfo[FII_BIND_TYPE], _, _, _ = GetItemInfo(item)
+        fullItemInfo[FII_ITEM] = item
 
-      -- determine whether the item is equippable
-      fullItemInfo[FII_IS_EQUIPPABLE] = IsEquippableItem(item)
+        -- Récupération des informations de base
+        _, _, fullItemInfo[FII_QUALITY], fullItemInfo[FII_BASE_ILVL], fullItemInfo[FII_REQUIRED_LEVEL],
+        fullItemInfo[FII_TYPE], fullItemInfo[FII_SUB_TYPE], _, fullItemInfo[FII_ITEM_EQUIP_LOC], _,
+        _, fullItemInfo[FII_CLASS], fullItemInfo[FII_SUB_CLASS], fullItemInfo[FII_BIND_TYPE], _, _, _ = GetItemInfo(item)
 
-      if fullItemInfo[FII_IS_EQUIPPABLE] then
+        -- Détection si l'objet est équipable
+        fullItemInfo[FII_IS_EQUIPPABLE] = IsEquippableItem(item)
 
-        -- set up the tooltip to determine values that aren't returned via GetItemInfo()
-        tooltipLong = tooltipLong or CreateFrame("GameTooltip", "BFLScanTooltip", nil, "GameTooltipTemplate")
-        tooltipLong:SetOwner(WorldFrame, "ANCHOR_NONE")
-        tooltipLong:ClearLines()
-        tooltipLong:SetHyperlink(item)
-        tooltipLong.leftside = {}
-        local i=1
-        while _G["BFLScanTooltipTextLeft" .. i] do
-          tooltipLong.leftside[i] = _G["BFLScanTooltipTextLeft" .. i]
-          i = i + 1
+        if fullItemInfo[FII_IS_EQUIPPABLE] then
+            -- Configurer le tooltip pour détecter les valeurs supplémentaires
+            tooltipLong = tooltipLong or CreateFrame("GameTooltip", "BFLScanTooltip", nil, "GameTooltipTemplate")
+            tooltipLong:SetOwner(WorldFrame, "ANCHOR_NONE")
+            tooltipLong:ClearLines()
+            tooltipLong:SetHyperlink(item)
+            tooltipLong.leftside = {}
+            local i = 1
+            while _G["BFLScanTooltipTextLeft" .. i] do
+                tooltipLong.leftside[i] = _G["BFLScanTooltipTextLeft" .. i]
+                i = i + 1
+            end
+
+            local realILVL = GetILVLFromTooltip(tooltipLong) or fullItemInfo[FII_BASE_ILVL]
+            fullItemInfo[FII_REAL_ILVL] = tonumber(realILVL)
+
+            local classes, hasBindTradeTimeWarning, hasSocket, hasAvoidance, hasIndestructible, hasLeech, hasSpeed, xmoggable, isBoundToAccount = nil, nil, false, false, false, false, false, false, false
+
+            local text
+            local index = 4
+            while tooltipLong.leftside[index] do
+                text = tooltipLong.leftside[index]:GetText()
+                
+                if text ~= nil then
+                    -- Recherche des mots-clés pour les liaisons au compte
+                    if text:find(ITEM_BIND_TO_ACCOUNT_PATTERN) or text:find(ITEM_BIND_TO_ACCOUNT_UNTIL_EQUIP_PATTERN) or 
+                       text:find(ITEM_BIND_TO_BNETACCOUNT_PATTERN) or text:find(ITEM_BNETACCOUNTBOUND_PATTERN) then
+                        isBoundToAccount = true
+                    end
+
+                    hasBindTradeTimeWarning = hasBindTradeTimeWarning or text:match(BIND_TRADE_TIME_REMAINING_PATTERN)
+                    classes = classes or text:match(ITEM_CLASSES_ALLOWED_PATTERN)
+                    hasSocket = hasSocket or text:find(_G.EMPTY_SOCKET_PRISMATIC) == 1
+                    hasAvoidance = hasAvoidance or text:find(_G.STAT_AVOIDANCE) ~= nil
+                    hasIndestructible = hasIndestructible or text:find(_G.STAT_STURDINESS) == 1
+                    hasLeech = hasLeech or text:find(_G.STAT_LIFESTEAL) ~= nil
+                    hasSpeed = hasSpeed or text:find(_G.STAT_SPEED) ~= nil
+                    xmoggable = xmoggable or text:find(TRANSMOGRIFY_TOOLTIP_APPEARANCE_UNKNOWN_PATTERN) ~= nil
+                end
+                index = index + 1
+            end
+
+            if classes ~= nil then
+                classes = string.upper(classes)
+                classes = string.gsub(classes, ' ', '')
+            end
+
+            -- Ajout des informations de liaison et des caractéristiques
+            fullItemInfo[FII_CLASSES] = classes
+            fullItemInfo[FII_TRADE_TIME_WARNING_SHOWN] = hasBindTradeTimeWarning
+            fullItemInfo[FII_HAS_SOCKET] = hasSocket
+            fullItemInfo[FII_HAS_AVOIDANCE] = hasAvoidance
+            fullItemInfo[FII_HAS_INDESTRUCTIBLE] = hasIndestructible
+            fullItemInfo[FII_HAS_LEECH] = hasLeech
+            fullItemInfo[FII_HAS_SPEED] = hasSpeed
+            fullItemInfo[FII_XMOGGABLE] = xmoggable
+            fullItemInfo[FII_IS_BOUND_TO_ACCOUNT] = isBoundToAccount  -- Détection de l'objet lié au compte
         end
-
-        -- determine the real iLVL
-        local realILVL = GetILVLFromTooltip(tooltipLong)
-        if realILVL == nil then  -- if we still couldn't find it (shouldn't happen), just use the base ilvl we got from GetItemInfo()
-          realILVL = fullItemInfo[FII_BASE_ILVL]
-        end
-        fullItemInfo[FII_REAL_ILVL] = tonumber(realILVL)
-
-        local classes = nil
-        local hasBindTradeTimeWarning = nil
-        local hasSocket = false
-        local hasAvoidance = false
-        local hasIndestructible = false
-        local hasLeech = false
-        local hasSpeed = false
-        local xmoggable = false
-        
-        
-        local text
-
-        local index = 6 -- the elements we're looking for are all further down in the tooltip
-        while tooltipLong.leftside[index] do
-          text = tooltipLong.leftside[index]:GetText()
-          if text ~= nil then
-            hasBindTradeTimeWarning = hasBindTradeTimeWarning or text:match(BIND_TRADE_TIME_REMAINING_PATTERN)
-            classes = classes or text:match(ITEM_CLASSES_ALLOWED_PATTERN)
-            hasSocket = hasSocket or text:find(_G.EMPTY_SOCKET_PRISMATIC) == 1
-            hasAvoidance = hasAvoidance or text:find(_G.STAT_AVOIDANCE) ~= nil
-            hasIndestructible = hasIndestructible or text:find(_G.STAT_STURDINESS) == 1
-            hasLeech = hasLeech or text:find(_G.STAT_LIFESTEAL) ~= nil
-            hasSpeed = hasSpeed or text:find(_G.STAT_SPEED) ~= nil
-            xmoggable = xmoggable or text:find(TRANSMOGRIFY_TOOLTIP_APPEARANCE_UNKNOWN_PATTERN) ~= nil  
-            
-            
-          end
-          index = index + 1
-        end
-
-        if classes ~= nil then
-          classes = string.upper(classes)
-          classes = string.gsub(classes, ' ', '')  -- remove space for DEMON HUNTER, DEATH KNIGHT
-        end
-
---      if hasBindTradeTimeWarning then
---        print("SETTING FII_TRADE_TIME_WARNING_SHOWN TO TRUE!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
---      end
-
-        fullItemInfo[FII_CLASSES] = classes
-        fullItemInfo[FII_TRADE_TIME_WARNING_SHOWN] = hasBindTradeTimeWarning
-        fullItemInfo[FII_HAS_SOCKET] = hasSocket
-        fullItemInfo[FII_HAS_AVOIDANCE] = hasAvoidance
-        fullItemInfo[FII_HAS_INDESTRUCTIBLE] = hasIndestructible
-        fullItemInfo[FII_HAS_LEECH] = hasLeech
-        fullItemInfo[FII_HAS_SPEED] = hasSpeed
-        fullItemInfo[FII_XMOGGABLE] = xmoggable
-        
-        
-      end
     end
 
     return fullItemInfo
-  end
+end
 
 local function IsTradeable(fullItemInfo)
-  noTradeBindOnEquip = SavedVariables:Get().noTradeBindOnEquip
-  if (fullItemInfo[FII_QUALITY] == Enum.ItemQuality.Rare or fullItemInfo[FII_QUALITY] == Enum.ItemQuality.Epic) and fullItemInfo[FII_BIND_TYPE] == 1 then return true 
-  elseif fullItemInfo[FII_BIND_TYPE] == 2 and not noTradeBindOnEquip then return true
-  else return false
-  end
+    local noTradeBindOnEquip = SavedVariables:Get().noTradeBindOnEquip
+
+    -- Vérification de l'objet lié au compte/bataillon
+    if fullItemInfo[FII_IS_BOUND_TO_ACCOUNT] then
+        return false
+    end
+
+    -- Logique existante pour les objets échangeables
+    if (fullItemInfo[FII_QUALITY] == Enum.ItemQuality.Rare or fullItemInfo[FII_QUALITY] == Enum.ItemQuality.Epic) 
+        and fullItemInfo[FII_BIND_TYPE] == 1 then
+        return true
+    elseif fullItemInfo[FII_BIND_TYPE] == 2 and not noTradeBindOnEquip then
+        return true
+    else
+        return false
+    end
 end
 
 local function GetItemPrimaryAttribute(item)
