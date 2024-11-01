@@ -234,7 +234,7 @@ UserInterface.frame = (function()
     width = TOTAL_FRAME_WIDTH - 20, -- Largeur de la frame
     titleText = L.WHISPER_TEXT, -- Texte du titre
   })
-  frame.GlobalWhisperFrame:SetFrameStrata("PARENT") -- Définir la strata de la frame
+  frame.GlobalWhisperFrame:SetFrameStrata("HIGH") -- Définir la strata de la frame
   frame.GlobalWhisperFrame:SetFrameLevel(2)
 
   -- Définir les informations de backdrop nécessaires dans toutes les frames Whisper
@@ -266,7 +266,7 @@ UserInterface.frame = (function()
     titleText = L.WHISPER_TEXT .. "1", -- Texte du titre avec le numéro 1
   })
 
-  frame.Whisper1:SetFrameStrata("PARENT") -- Définir la strata de la frame
+  frame.Whisper1:SetFrameStrata("HIGH") -- Définir la strata de la frame
   frame.Whisper1:SetFrameLevel(3)
 
   -- Create and position the title text for Whisper 1
@@ -340,7 +340,7 @@ UserInterface.frame = (function()
     width = TOTAL_FRAME_WIDTH/3-10,
     titleText = L.WHISPER_TEXT .. "2",
   })  
-  frame.Whisper2:SetFrameStrata("PARENT")
+  frame.Whisper2:SetFrameStrata("HIGH")
   frame.Whisper2:SetFrameLevel(3)
   
   -- Create and position the title text for Whisper 2
@@ -414,7 +414,7 @@ UserInterface.frame = (function()
       width = TOTAL_FRAME_WIDTH/3-10,
       titleText = L.WHISPER_TEXT .. "3",
     })  
-  frame.Whisper3:SetFrameStrata("PARENT")
+  frame.Whisper3:SetFrameStrata("HIGH")
   frame.Whisper3:SetFrameLevel(3)
 
   -- Create and position the title text for Whisper 3
