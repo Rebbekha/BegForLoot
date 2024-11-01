@@ -228,8 +228,8 @@ UserInterface.frame = (function()
     name = "$parent_GlobalWhisperFrame",
     parent = frame,
     points = {
-      { "TOPLEFT", frame.optionsFrame, "BOTTOMLEFT", 0, 5}, -- Positionnement de la frame
-      { "BOTTOMRIGHT", frame, "BOTTOMRIGHT", -10, 10}
+      { "TOPLEFT", frame.optionsFrame, "BOTTOMLEFT", 0, -5}, -- Positionnement de la frame
+      { "BOTTOMRIGHT", frame, "BOTTOMRIGHT", -10, 15}
     },
     width = TOTAL_FRAME_WIDTH - 20, -- Largeur de la frame
     titleText = L.WHISPER_TEXT, -- Texte du titre
