@@ -1,0 +1,11 @@
+## Interface: 100007
+## Title: Beg For Loot
+## Notes: L'addon permet d'analyser et de demander des loot sous certaines conditions.
+## Author: Rebekha
+## SavedVariables: __BEGFORLOOT_ADDON_GLOBAL_SAVED_VARIABLES__ 
+## SavedVariablesPerCharacter: WindowSettings
+## IconTexture: Interface\AddOns\BegForLoot\assets\Begforloot-icon.tga
+
+
+BegForLoot.xml
+
