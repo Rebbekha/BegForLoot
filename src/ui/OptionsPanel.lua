@@ -26,21 +26,13 @@ end
 
 -- Patch Notes Data Structure
 local patchNotes = {
-    {
-        version = "1.0.2",
-        improvements = {
-            "Added new features.",
-        },
-        bugs = {
-            "Fixed several minor bugs.",
-        },
-        features = {}
-    },
-    {
+  --[[
+	Template of the patch note:
+
+	    {
         version = "1.0.1",
         improvements = {
-            "Added new features.",
-            "Improved UI responsiveness."
+            "Add new language (French)."
         },
         bugs = {
             "Fixed several minor bugs.",
@@ -50,6 +42,9 @@ local patchNotes = {
             "Introduced new loot tracking system."
         }
     },
+]]--
+
+
     {
         version = "1.0.0",
         improvements = {},
