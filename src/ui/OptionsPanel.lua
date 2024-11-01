@@ -44,7 +44,19 @@ local patchNotes = {
     },
 ]]--
 
-
+     {
+        version = "1.0.1",
+        improvements = {
+            "Update the list of commands of the minimap icon"
+        },
+        bugs = {
+            "Fixed issue with the display of the option frame.",
+            "Resolved issue with the english translation."
+        },
+        features = {
+            ""
+        }
+    },
     {
         version = "1.0.0",
         improvements = {},
