@@ -51,10 +51,8 @@ local patchNotes = {
         },
         bugs = {
             "Fixed issue with the display of the option frame.",
-            "Resolved issue with the english translation."
-        },
-        features = {
-            ""
+            "Resolved issue with the english translation.",
+	    "Fixed issue of the warband items were considered tradable."
         }
     },
     {
