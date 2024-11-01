@@ -33,7 +33,7 @@ EventManager:Once(E.SavedVariablesReady, function()
       tooltip:AddDoubleLine(Colors.Blue(ADDON_NAME), Colors.Gold(Addon.VERSION))
       tooltip:AddLine(" ")
       addDoubleLine(tooltip, L.LEFT_CLICK, L.COMMAND_DESCRIPTION_OPTIONS)
-      addDoubleLine(tooltip, L.RIGHT_CLICK, L.COMMAND_DESCRIPTION_LOOT)
+      addDoubleLine(tooltip, L.RIGHT_CLICK, L.COMMAND_DESCRIPTION_LOOT_FRAME)
       
     end
   })
