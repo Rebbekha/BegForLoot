@@ -25,15 +25,15 @@ EventManager:Once(E.SavedVariablesReady, function()
       end
 
       if button == "RightButton" then
-        Commands.options()
+        Commands.loot()
       end
     end,
 
     OnTooltipShow = function(tooltip)
       tooltip:AddDoubleLine(Colors.Blue(ADDON_NAME), Colors.Gold(Addon.VERSION))
       tooltip:AddLine(" ")
-      addDoubleLine(tooltip, L.LEFT_CLICK, L.TOGGLE_OPTIONS_FRAME)
-      addDoubleLine(tooltip, L.RIGHT_CLICK, L.TOGGLE_OPTIONS_FRAME)
+      addDoubleLine(tooltip, L.LEFT_CLICK, L.COMMAND_DESCRIPTION_OPTIONS)
+      addDoubleLine(tooltip, L.RIGHT_CLICK, L.COMMAND_DESCRIPTION_LOOT)
       
     end
   })
