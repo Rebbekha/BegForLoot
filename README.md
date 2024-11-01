@@ -1,5 +1,3 @@
-# Beg-For-Loot
-
 Beg for Loot
 
  
