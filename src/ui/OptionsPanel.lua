@@ -43,7 +43,14 @@ local patchNotes = {
         }
     },
 ]]--
-
+     {
+        version = "1.0.2",
+        improvements = {},
+        bugs = {
+            "Fixed issue with the display of the option frame.",
+        },
+	features ={}
+    },
      {
         version = "1.0.1",
         improvements = {
@@ -53,7 +60,8 @@ local patchNotes = {
             "Fixed issue with the display of the option frame.",
             "Resolved issue with the english translation.",
 	    "Fixed issue of the warband items were considered tradable."
-        }
+        },
+	features ={}
     },
     {
         version = "1.0.0",
