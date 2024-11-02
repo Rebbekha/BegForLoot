@@ -78,13 +78,18 @@ UserInterface.frame = (function()
     width = OPTIONS_FRAME_WIDTH,
     titleText = L.GLOBAL_OPTIONS_TEXT
   })
-  frame.optionsFrame:AddOption({  										--- Minimap button 
+  frame.optionsFrame:AddOption({  								--- Minimap button 
     labelText = L.MINIMAP_ICON_TEXT,
     tooltipText = L.MINIMAP_ICON_TOOLTIP,
     get = function() return MinimapIcon:IsEnabled() end,
     set = function(value) MinimapIcon:SetEnabled(value) end
   })
-
+  frame.optionsFrame:AddOption({								--- Promote the Addon
+    labelText = L.PROMOTE_ADDON,
+    tooltipText = L.PROMOTE_ADDON_TOOLTIP,
+    get = function() return SavedVariables:Get().PromoteAddon end,
+    set = function(value) SavedVariables:Get().PromoteAddon = value end
+  })
   
   --2e Frame Offering Loot Option
   frame.OfferingOptionFrame =  Widgets:OptionsFrame({						--~ Offering Loot Option
@@ -98,14 +103,14 @@ UserInterface.frame = (function()
     titleText = L.OFFERING_LOOT_OPTIONS_TEXT
   })
 
-  frame.OfferingOptionFrame:AddOption({									--- no Trade Bind On Equip
+  frame.OfferingOptionFrame:AddOption({								--- no Trade Bind On Equip
     labelText = L.NO_TRADE_BIND_ON_EQUIP_TEXT,
     tooltipText = L.NO_TRADE_BIND_ON_EQUIP_TEXT_TOOLTIP,
     get = function() return SavedVariables:Get().noTradeBindOnEquip end,
     set = function(value) SavedVariables:Get().noTradeBindOnEquip = value end
   })
   frame.OfferingOptionFrame:AddOption({
-    labelText = L.NEVER_OFFERING_TEXT,											--- Show List User
+    labelText = L.NEVER_OFFERING_TEXT,								--- Never offer your loot
     tooltipText = L.NEVER_OFFERING_TEXT_TOOLTIP,
     get = function() return SavedVariables:Get().neverOffering end,
     set = function(value) SavedVariables:Get().neverOffering = value end
@@ -122,7 +127,7 @@ UserInterface.frame = (function()
     width = TRANSMOG_OPTIONS_FRAME_WIDTH,
     titleText = L.RECEIVING_LOOT_OPTIONS_TEXT
   })
-    frame.ReceivingOptionFrame:AddOption({									--- Ilvl upgrade and below upgrade
+    frame.ReceivingOptionFrame:AddOption({							--- Ilvl upgrade and below upgrade
     labelText = L.ILVL_UPGRADE_TEXT,
     onUpdateTooltip = function(self, tooltip)
       local itemLevel = Colors.White(SavedVariables:Get().ilvlUpgrade.value)
@@ -157,13 +162,13 @@ UserInterface.frame = (function()
     width = TRANSMOG_OPTIONS_FRAME_WIDTH,
     titleText = L.TRANSMOG_UNKNOWN_TITLE_TEXT,
   })
-  frame.TransmogOptionFrame:TransmogAddOption({  									--- Transmog unknown 
+  frame.TransmogOptionFrame:TransmogAddOption({  						--- Transmog unknown 
     labelText = L.TRANSMOG_UNKNOWN_TEXT,
     tooltipText = L.TRANSMOG_UNKNOWN_TOOLTIP,
     get = function() return SavedVariables:Get().transmogUnknown end,
     set = function(value) SavedVariables:Get().transmogUnknown = value end  
   })
-  frame.TransmogOptionFrame:TransmogAddOption({  									--- Transmog unknown Appearance Only
+  frame.TransmogOptionFrame:TransmogAddOption({  						--- Transmog unknown Appearance Only
     labelText = L.TRANSMOG_UNKNOWN_APPEARANCE_ONLY_TEXT,
     tooltipText = L.TRANSMOG_UNKNOWN_APPEARANCE_ONLY_TOOLTIP,
     get = function() return SavedVariables:Get().transmogUnknownAppearanceOnly end,
@@ -172,7 +177,7 @@ UserInterface.frame = (function()
 	  SavedVariables:Get().transmogUnknownSharedAppearance = false
 	end
   })
-  frame.TransmogOptionFrame:TransmogAddOption({  									--- Transmog unknown Shared Appearance
+  frame.TransmogOptionFrame:TransmogAddOption({  						--- Transmog unknown Shared Appearance
     labelText = L.TRANSMOG_UNKNOWN_SHARED_APPEARANCE_TEXT,
     tooltipText = L.TRANSMOG_UNKNOWN_SHARED_APPEARANCE_TOOLTIP,
     get = function() return SavedVariables:Get().transmogUnknownSharedAppearance end,
@@ -181,7 +186,7 @@ UserInterface.frame = (function()
 	  SavedVariables:Get().transmogUnknownAppearanceOnly = false
 	end
   })  
-  frame.TransmogOptionFrame:TransmogAddOption({  									--- Transmog unknown All class
+  frame.TransmogOptionFrame:TransmogAddOption({  						--- Transmog unknown All class
     labelText = L.TRANSMOG_UNKNOWN_FOR_ALL_CLASS_TEXT,
     tooltipText = L.TRANSMOG_UNKNOWN_FOR_ALL_CLASS_TOOLTIP,
     get = function() return SavedVariables:Get().transmogUnknownForAllClass end,
@@ -191,7 +196,7 @@ UserInterface.frame = (function()
       SavedVariables:Get().transmogUnknownForMySpec = false
 	end
   })
-  frame.TransmogOptionFrame:TransmogAddOption({  									--- Transmog unknown My class
+  frame.TransmogOptionFrame:TransmogAddOption({  						--- Transmog unknown My class
     labelText = L.TRANSMOG_UNKNOWN_FOR_MY_CLASS_TEXT,
     tooltipText = L.TRANSMOG_UNKNOWN_FOR_MY_CLASS_TOOLTIP,
     get = function() return SavedVariables:Get().transmogUnknownForMyClass end,
@@ -202,7 +207,7 @@ UserInterface.frame = (function()
 
 	end
   }) 
-  frame.TransmogOptionFrame:TransmogAddOption({  									--- Transmog unknown My spec
+  frame.TransmogOptionFrame:TransmogAddOption({  						--- Transmog unknown My spec
     labelText = L.TRANSMOG_UNKNOWN_FOR_MY_SPEC_TEXT,
     tooltipText = L.TRANSMOG_UNKNOWN_FOR_MY_SPEC_TOOLTIP,
     get = function() return SavedVariables:Get().transmogUnknownForMySpec end,
