@@ -44,10 +44,20 @@ local patchNotes = {
     },
 ]]--
      {
+        version = "1.0.3",
+        improvements = {
+            "Clean some legacy code"
+	},
+        bugs = {},
+	features ={
+            "Add the Promote the Addon option"
+	}
+    },
+     {
         version = "1.0.2",
         improvements = {},
         bugs = {
-            "Fixed issue with the display of the option frame.",
+            "Fixed issue with the display of the option frame."
         },
 	features ={}
     },
@@ -59,7 +69,7 @@ local patchNotes = {
         bugs = {
             "Fixed issue with the display of the option frame.",
             "Resolved issue with the english translation.",
-	    "Fixed issue of the warband items were considered tradable."
+            "Fixed issue of the warband items were considered tradable."
         },
 	features ={}
     },
