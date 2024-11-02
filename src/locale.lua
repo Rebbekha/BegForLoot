@@ -17,7 +17,8 @@ setmetatable(L, {
 L["GLOBAL_OPTIONS_TEXT"] = "General Options"
 L["MINIMAP_ICON_TEXT"] = "Minimap Icon"
 L["MINIMAP_ICON_TOOLTIP"] = "Enable an icon on the minimap."
-
+L["PROMOTE_ADDON"] = "Promote the Addon"
+L["PROMOTE_ADDON_TOOLTIP"] = "If the option is activated, the name of the Addon (<Beg for Loot>) will be put at the beginning of each message sent by the addon."
 
   --Offering Loot
 L["OFFERING_LOOT_OPTIONS_TEXT"] = "Offering Loot Options"
