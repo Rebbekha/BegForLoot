@@ -51,16 +51,27 @@ local function ReplaceItemInMessage(itemLink, message)
 end
 
 function FonctionButton:SendWhisper(Whisper, playerName, itemlink)
-	SendChatMessage(ReplaceItemInMessage(itemlink, Whisper), 'WHISPER', nil, Ambiguate(playerName, 'mail'))
+  local PromoteAddon = SavedVariables:Get().PromoteAddon
+  local message = ReplaceItemInMessage(itemlink, Whisper)
+  if PromoteAddon then
+    message = "<Beg For Loot>" .. ReplaceItemInMessage(itemlink, Whisper)
+  end
+  SendChatMessage(message, 'WHISPER', nil, Ambiguate(playerName, 'mail'))
 end
 
 function FonctionButton:SendMessage(Whisper, itemlink)
+  local PromoteAddon = SavedVariables:Get().PromoteAddon
+  local message = ReplaceItemInMessage(itemlink, Whisper)
+  if PromoteAddon then
+    message = "<Beg For Loot>" .. ReplaceItemInMessage(itemlink, Whisper)
+  end
+  
   if IsInRaid() then
-    SendChatMessage(ReplaceItemInMessage(itemlink, Whisper), "RAID")
+    SendChatMessage(message, "RAID")
   elseif IsInGroup() then
-    SendChatMessage(ReplaceItemInMessage(itemlink, Whisper), "PARTY")
+    SendChatMessage(message, "PARTY")
   else
-    SendChatMessage(ReplaceItemInMessage(itemlink, Whisper), "SAY")
+    SendChatMessage(message, "SAY")
   end
 
 end
