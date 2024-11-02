@@ -14,10 +14,8 @@ local PERCHAR_SV = "__BEGFORLOOT_ADDON_PERCHAR_SAVED_VARIABLES__"
 local function globalDefaults()
   return {
   -- Global Option.
-  autoSkipConfirmation = false,
-  announceCompletedTrade = false,
+  PromoteAddon = true,
   minimapIcon = { hide = false },
-  chatMessages = true,
 
   -- Offering Loot Option.
   ilvlUpgradeOffering = false,
