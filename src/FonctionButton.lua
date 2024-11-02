@@ -63,7 +63,7 @@ function FonctionButton:SendMessage(Whisper, itemlink)
   local PromoteAddon = SavedVariables:Get().PromoteAddon
   local message = ReplaceItemInMessage(itemlink, Whisper)
   if PromoteAddon then
-    message = "<Beg For Loot>" .. ReplaceItemInMessage(itemlink, Whisper)
+    message = "<Beg For Loot> " .. ReplaceItemInMessage(itemlink, Whisper)
   end
   
   if IsInRaid() then
