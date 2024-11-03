@@ -16,7 +16,8 @@ local function globalDefaults()
   -- Global Option.
   PromoteAddon = true,
   minimapIcon = { hide = false },
-
+  GroupLoot = true,
+    
   -- Offering Loot Option.
   ilvlUpgradeOffering = false,
   noTradeBindOnEquip = false,
