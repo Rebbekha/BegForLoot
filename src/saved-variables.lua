@@ -17,6 +17,10 @@ local function globalDefaults()
   PromoteAddon = true,
   minimapIcon = { hide = false },
   GroupLoot = true,
+  optionMount = true,
+  optionPet = true,
+  optionToy = true,
+  optionRecipe = true,
     
   -- Offering Loot Option.
   ilvlUpgradeOffering = false,
