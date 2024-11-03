@@ -21,7 +21,14 @@ L["PROMOTE_ADDON_TEXT"] = "Promote the Addon"
 L["PROMOTE_ADDON_TEXT_TOOLTIP"] = "If the option is activated, the name of the Addon (<Beg for Loot>) will be put at the beginning of each message sent by the addon."
 L["GROUP_LOOT_TEXT"] = "Group Loot Rolls"
 L["GROUP_LOOT_TEXT_TOOLTIP"] = "Experimental Function : Enable the option to whisper the winner of group loot rolls."
-
+L["OPTION_PET_TEXT"] = "Pets"
+L["OPTION_PET_TEXT_TOOLTIP"] = "Add the pets to the list of items we wish to trade or acquire.|nIf someone loots a pet you need it will appear in the loot frame and if you loot a pet you already have you can offer it."
+L["OPTION_TOY_TEXT"] = "Toys"
+L["OPTION_TOY_TEXT_TOOLTIP"] = "Add the toys to the list of items we wish to trade or acquire.|nIf someone loots a toy you need it will appear in the loot frame and if you loot a toy you already have you can offer it."
+L["OPTION_MOUNT_TEXT"] = "Mounts"
+L["OPTION_MOUNT_TEXT_TOOLTIP"] = "Add the mounts to the list of items we wish to trade or acquire. |nIf someone loots a mount you need it will appear in the loot frame and if you loot a mount you already have you can offer it."
+L["OPTION_RECIPE_TEXT"] = "Recipes"
+L["OPTION_RECIPE_TEXT_TOOLTIP"] = "Add the all recipes to the list of items we wish to trade or acquire. No filter applicate yet"
 
   --Offering Loot
 L["OFFERING_LOOT_OPTIONS_TEXT"] = "Offering Loot Options"
