@@ -90,7 +90,6 @@ UserInterface.frame = (function()
     get = function() return SavedVariables:Get().PromoteAddon end,
     set = function(value) SavedVariables:Get().PromoteAddon = value end
   })
-  GroupLoot
   frame.optionsFrame:AddOption({								--- Group Loot Roll
     labelText = L.GROUP_LOOT_TEXT,
     tooltipText = L.GROUP_LOOT_TEXT_TOOLTIP,
