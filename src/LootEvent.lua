@@ -394,6 +394,9 @@ local RECIPE_SUBTYPE = 9
 ObjectList = ObjectList or {}
 local receivedItems = {}
 
+local lootListening = false
+local LootRollWinners = {}
+
 debugLootEvent = false
 
      -----------------------------------------------------------------------
@@ -1112,10 +1115,68 @@ EventManager:On("ENCOUNTER_LOOT_RECEIVED", function(encounterID, itemID, itemLin
     print('ERROR: there are no valid names.')
   end
 end)
+--------------------------------------------------------------
+--------- Function and Event for Group loot Roll -------------
+--------------------------------------------------------------
 
--- Event Loot is in roll
+-- On évite de checker chaque message. Donc on commence à appliquer la logique après que cette évènement survient
+EventManager:On("LOOT_HISTORY_UPDATE_DROP", function()
+  lootListening = true
+end)
 
-EventManager:On("ROLL_END", function(rollID, winnerName, itemID)
+-- Quand on a quitter le group on ne peux plus savoir qui a fait les rolls donc on nettoie tous et on arrete de traiter chaque message
+EventManager:On("GROUP_LEFT", function()
+  lootListening = false
+  LootRollWinners = {} -- Clear the LootRollWinners table when leaving the group
+end)
+
+-- Registering the CHAT_MSG_LOOT event
+EventManager:On("CHAT_MSG_LOOT", function(message, playerfullname)
+  -- Check if lootListening is active
+  if not lootListening then return end
+  
+  -- Check if playerfullname is nil or empty
+  if playerfullname == nil or playerfullname == "" then
+    -- Check if the message starts with "[" and contains "] : ", and if the end of the message is an item link
+    if message:sub(1, 1) == "[" and message:find("] : ") and message:match("|c%x+|H(.+)|h%[(.+)%]|h|r$") then
+      -- Extract the player name without the server name
+      local playerwithoutservername = message:match("] : (.+)%s*%(") -- Retrieve the player name
+      -- Extract the item link
+      local itemlink = message:match("|c%x+|H(.+)|h%[(.+)%]|h|r$") -- Extracts the item link
+
+      -- Store both variables in the LootRollWinners table
+      if not LootRollWinners[playerwithoutservername] then
+        LootRollWinners[playerwithoutservername] = {}
+      end
+      
+      table.insert(LootRollWinners[playerwithoutservername], itemlink)
+
+    else
+      return -- Exit if conditions are not met
+    end
+
+  else
+    -- Check if playerfullname can find a matching name in LootRollWinners
+    for playerName, items in pairs(LootRollWinners) do
+      if playerfullname:find(playerName) then -- Check if the full name matches a player
+        for index, item in ipairs(items) do
+          if item then
+            -- Trigger the WinnerFound event for each matching item
+            EventManager:Fire(E.WinnerFound(playerfullname, item))
+            -- Remove the item from the list after processing it
+            table.remove(items, index)
+            break -- Exit the loop once the item is processed to avoid index issues
+          end
+        end
+        return -- Exit once a match is found
+      end
+    end
+
+    return -- Exit if no match was found
+  end
+end)
+
+EventManager:On(E.WinnerFound, function(playername, itemLink)
   -- Check if the player is fully loaded : uselful for player with low config
   if not playerReady then
     return -- Exit if the player is not fully loaded
@@ -1125,9 +1186,6 @@ EventManager:On("ROLL_END", function(rollID, winnerName, itemID)
   if not GroupLoot then
     return -- Exit we don't want to whisper the winner of the group loot
   end
-  --Init the name and the itemlink 
-  local playerName = winnerName
-  local itemLink = GetItemLink(itemID) -- Get the item link using the item ID
 		
  -- Get full item information using the GetFullItemInfo functionZ
   local fullItemInfo = GetFullItemInfo(itemLink)
@@ -1160,7 +1218,7 @@ EventManager:On("ROLL_END", function(rollID, winnerName, itemID)
   -- The loot is from other
   if playerName ~= myName then
     -- Retrieve user-selected options from saved variables
-	local ilvlUpgrade = SavedVariables:Get().ilvlUpgrade.enabled
+    local ilvlUpgrade = SavedVariables:Get().ilvlUpgrade.enabled
     local ilvlBelow = SavedVariables:Get().ilvlUpgrade.value
     local TransmogUnknown = SavedVariables:Get().transmogUnknown
     local transmogUnknownAppearanceOnly = SavedVariables:Get().transmogUnknownAppearanceOnly
