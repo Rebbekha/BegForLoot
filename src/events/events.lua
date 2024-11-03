@@ -12,6 +12,7 @@ local events = {
   "SavedVariablesReady",
   "NewObjectList",
   "NewReceivedItems",
+  "WinnerFound",
   "UpdateText"
 }
 
@@ -24,12 +25,7 @@ end
 -- ============================================================================
 
 E.Wow = {
-  BagUpdate = "BAG_UPDATE",
-  BagUpdateDelayed = "BAG_UPDATE_DELAYED",
   EncounterLootReceived = "ENCOUNTER_LOOT_RECEIVED",
   PlayerLogin = "PLAYER_LOGIN",
   PlayerLogout = "PLAYER_LOGOUT",
-  UIErrorMessage = "UI_ERROR_MESSAGE",
-  InspectReadyEvent = "INSPECT_READY",
-  CombatStatusChangedEvent = "PLAYER_REGEN_DISABLED"
 }
