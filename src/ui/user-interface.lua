@@ -91,12 +91,37 @@ UserInterface.frame = (function()
     set = function(value) SavedVariables:Get().PromoteAddon = value end
   })
   GroupLoot
-  frame.optionsFrame:AddOption({								--- Promote the Addon
+  frame.optionsFrame:AddOption({								--- Group Loot Roll
     labelText = L.GROUP_LOOT_TEXT,
     tooltipText = L.GROUP_LOOT_TEXT_TOOLTIP,
     get = function() return SavedVariables:Get().GroupLoot end,
     set = function(value) SavedVariables:Get().GroupLoot = value end
   })
+  frame.optionsFrame:AddOption({								--- Option Pet
+    labelText = L.OPTION_PET_TEXT,
+    tooltipText = L.OPTION_PET_TEXT_TOOLTIP,
+    get = function() return SavedVariables:Get().optionPet end,
+    set = function(value) SavedVariables:Get().optionPet = value end
+  })
+  frame.optionsFrame:AddOption({								---Option Toy
+    labelText = L.OPTION_TOY_TEXT,
+    tooltipText = L.OPTION_TOY_TEXT_TOOLTIP,
+    get = function() return SavedVariables:Get().optionToy end,
+    set = function(value) SavedVariables:Get().optionToy = value end
+  })
+  frame.optionsFrame:AddOption({								--- Option Mount
+    labelText = L.OPTION_MOUNT_TEXT,
+    tooltipText = L.OPTION_MOUNT_TEXT_TOOLTIP,
+    get = function() return SavedVariables:Get().optionMount end,
+    set = function(value) SavedVariables:Get().optionMount = value end
+  })
+  frame.optionsFrame:AddOption({								--- Option Recipe
+    labelText = L.OPTION_RECIPE_TEXT,
+    tooltipText = L.OPTION_RECIPE_TEXT_TOOLTIP,
+    get = function() return SavedVariables:Get().optionRecipe end,
+    set = function(value) SavedVariables:Get().optionRecipe = value end
+  })
+		
   --2e Frame Offering Loot Option
   frame.OfferingOptionFrame =  Widgets:OptionsFrame({						--~ Offering Loot Option
     name = "$parent_OfferingOptionFrame",
