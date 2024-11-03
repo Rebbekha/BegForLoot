@@ -80,17 +80,23 @@ UserInterface.frame = (function()
   })
   frame.optionsFrame:AddOption({  								--- Minimap button 
     labelText = L.MINIMAP_ICON_TEXT,
-    tooltipText = L.MINIMAP_ICON_TOOLTIP,
+    tooltipText = L.MINIMAP_ICON_TEXT_TOOLTIP,
     get = function() return MinimapIcon:IsEnabled() end,
     set = function(value) MinimapIcon:SetEnabled(value) end
   })
   frame.optionsFrame:AddOption({								--- Promote the Addon
-    labelText = L.PROMOTE_ADDON,
-    tooltipText = L.PROMOTE_ADDON_TOOLTIP,
+    labelText = L.PROMOTE_ADDON_TEXT,
+    tooltipText = L.PROMOTE_ADDON_TEXT_TOOLTIP,
     get = function() return SavedVariables:Get().PromoteAddon end,
     set = function(value) SavedVariables:Get().PromoteAddon = value end
   })
-  
+  GroupLoot
+  frame.optionsFrame:AddOption({								--- Promote the Addon
+    labelText = L.GROUP_LOOT_TEXT,
+    tooltipText = L.GROUP_LOOT_TEXT_TOOLTIP,
+    get = function() return SavedVariables:Get().GroupLoot end,
+    set = function(value) SavedVariables:Get().GroupLoot = value end
+  })
   --2e Frame Offering Loot Option
   frame.OfferingOptionFrame =  Widgets:OptionsFrame({						--~ Offering Loot Option
     name = "$parent_OfferingOptionFrame",
