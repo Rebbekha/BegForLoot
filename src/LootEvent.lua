@@ -1065,6 +1065,179 @@ EventManager:On("ENCOUNTER_LOOT_RECEIVED", function(encounterID, itemID, itemLin
   end
 end)
 
+-- Event Loot is in roll
+
+EventManager:On("ROLL_END", function(rollID, winnerName, itemID)
+  -- Check if the player is fully loaded : uselful for player with low config
+  if not playerReady then
+    return -- Exit if the player is not fully loaded
+  end
+
+  local GroupLoot = SavedVariables:Get().GroupLoot
+  if not GroupLoot then
+    return -- Exit we don't want to whisper the winner of the group loot
+  end
+  --Init the name and the itemlink 
+  local playerName = winnerName
+  local itemLink = GetItemLink(itemID) -- Get the item link using the item ID
+		
+  -- Get full item information using the GetFullItemInfo function
+  local fullItemInfo = GetFullItemInfo(itemLink)
+  
+  
+  --Check if the item have an ilvl and is tradeable
+  if fullItemInfo == nil then return print("fulliteminfo is nil") end 
+    -- Check if the item is equippable and tradeable
+  if fullItemInfo[FII_REAL_ILVL] == nil then
+  --print("pas d'ilvl non equipable")
+  return
+  end
+    -- If the item is not tradeable, exit
+  if not IsTradeable(fullItemInfo)then 
+  --print("Item not Tradeable")  
+  return
+  end
+  
+  --Code 
+  local myName = UnitName("player") -- Get the name of the current player
+  local _, myClass = UnitClass('player')
+  
+  -- The loot is from other
+  if playerName ~= myName then
+    -- Retrieve user-selected options from saved variables
+    local ilvlUpgrade = SavedVariables:Get().ilvlUpgrade.enabled
+    local ilvlBelow = SavedVariables:Get().ilvlUpgrade.value
+    local TransmogUnknown = SavedVariables:Get().transmogUnknown
+    local transmogUnknownAppearanceOnly = SavedVariables:Get().transmogUnknownAppearanceOnly
+    local transmogUnknownAllSharedAppearance = SavedVariables:Get().transmogUnknownSharedAppearance
+    local transmogUnknownForAllClass = SavedVariables:Get().transmogUnknownForAllClass
+    local transmogUnknownForMyClass = SavedVariables:Get().transmogUnknownForMyClass
+    local transmogUnknownForMySpec = SavedVariables:Get().transmogUnknownForMySpec
+	
+	
+	--Option Ilvl Upgrade
+    if ilvlUpgrade then
+      GetSlotIdFromItemId(itemID, function(slotID)
+        if not slotID then
+          print("ERROR: Unable to determine slot ID for item ID:", itemID)
+          return
+        end
+
+        local equippedItemLink = GetInventoryItemLink("player", slotID) -- Get the item equipped in the specified slot
+        if IsItemUsefulForthePlayerSpec(fullItemInfo, myName, true) then -- Check if the item is useful for the player's spec
+          if equippedItemLink then
+            local equippedItemName, equippedItemLink, equippedItemQuality, equippedItemLevel = GetItemInfo(equippedItemLink) -- Get info of the equipped item
+            if equippedItemLevel then
+              local IlvlSeuil = equippedItemLevel - ilvlBelow -- Calculate the ilvl threshold
+              if fullItemInfo[FII_REAL_ILVL] >= IlvlSeuil then
+                AddObjectlist(fullItemInfo, playerName, 'ILVL UPGRADE') -- Add the item to the list if it exceeds the threshold
+                return
+              end
+            else
+              print("ERROR: Failed to retrieve the level of the equipped item:", equippedItemLink)
+            end
+          else
+            AddObjectlist(fullItemInfo, playerName, 'ILVL UPGRADE') -- If no item is equipped, consider it an upgrade
+            return
+          end
+        end
+      end)
+    end
+	
+	--Option Transmog
+    if TransmogUnknown then 
+	-- Check if the item is ring/necklace/trinket
+	if fullItemInfo[FII_ITEM_EQUIP_LOC] == 'INVTYPE_FINGER' or fullItemInfo[FII_ITEM_EQUIP_LOC] == 'INVTYPE_NECK' or fullItemInfo[FII_ITEM_EQUIP_LOC] == 'INVTYPE_TRINKET' then
+	  return
+    end
+	
+      local HasTransmogItem = C_TransmogCollection.PlayerHasTransmog(itemID)
+      --Option 1 : For all class
+      if transmogUnknownForAllClass then 
+        --Option 1.1: Collect only the appearance
+        if transmogUnknownAppearanceOnly then 
+		  if fullItemInfo[FII_XMOGGABLE] then 
+            AddObjectlist(fullItemInfo, playerName, 'XMog')
+		    return 
+		  end
+	    --Option 1.2: Collect all the sources of the appearances
+	    elseif transmogUnknownAllSharedAppearance then
+		  if not HasTransmogItem then 
+            AddObjectlist(fullItemInfo, playerName, 'XMog')
+		    return 
+		  end
+        end
+	  
+	  --Option 2 : For my class  
+      elseif transmogUnknownForMyClass then
+	    --Option 2.1: Collect only the appearance
+        if transmogUnknownAppearanceOnly then 
+		  if fullItemInfo[FII_XMOGGABLE] then 
+            AddObjectlist(fullItemInfo, playerName, 'XMog')
+		    return 
+		  end
+	    --Option 2.2: Collect all the sources of the appearances
+	    elseif transmogUnknownAllSharedAppearance then
+		  if not HasTransmogItem then 
+            AddObjectlist(fullItemInfo, playerName, 'XMog')
+		    return 
+		  end
+        end
+	  
+	  --Option 3 : For my spec
+	  elseif transmogUnknownForMySpec then
+	    --Option 3.1: Collect only the appearance
+        if transmogUnknownAppearanceOnly then 
+		  if fullItemInfo[FII_XMOGGABLE] then 
+            AddObjectlist(fullItemInfo, playerName, 'XMog')
+		    return 
+		  end
+	    --Option 3.2: Collect all the sources of the appearances
+	    elseif transmogUnknownAllSharedAppearance then
+		  if not HasTransmogItem then 
+            AddObjectlist(fullItemInfo, playerName, 'XMog')
+		    return 
+		  end
+        end
+      end
+--End of the boucle TransmogUnknown
+    end
+
+  -- You received a loot
+  elseif playerName == myName then 
+  
+    -- Retrieve user-selected options from saved variables
+    local neverOffering = SavedVariables:Get().neverOffering
+	
+	--Checking the options :
+	if neverOffering then return end
+	
+	-- Check if the player is in a raid, party, if the player is alone we don't need to offer items
+    if not IsInRaid() and not IsInGroup() then return end
+	
+	-- Check if the item is ring/necklace/trinket
+	if fullItemInfo[FII_ITEM_EQUIP_LOC] == 'INVTYPE_FINGER' or fullItemInfo[FII_ITEM_EQUIP_LOC] == 'INVTYPE_NECK' or fullItemInfo[FII_ITEM_EQUIP_LOC] == 'INVTYPE_TRINKET' then
+      AddObjectlist(fullItemInfo, playerName, 'Offer Item')
+	  return
+    end
+	
+	--Checking if the player has the transmog
+    local HasTransmogItem = C_TransmogCollection.PlayerHasTransmog(itemID)
+	print(fullItemInfo[FII_CLASSES])
+    if HasTransmogItem then
+      AddObjectlist(fullItemInfo, playerName, 'Offer Item')
+	  return
+	elseif fullItemInfo[FII_CLASSES] ~= myClass and fullItemInfo[FII_CLASSES] ~= nil then
+	  AddObjectlist(fullItemInfo, playerName, 'Offer Item')
+	  return
+	else 
+	  return
+    end
+	
+  else
+    print('ERROR: there are no valid names.')
+  end
+end)
 
 ------------------------------------------------------------------------------------
 ------------------------- NEWOBJECTLIST EVENT --------------------------------------
