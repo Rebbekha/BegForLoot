@@ -44,13 +44,15 @@ local patchNotes = {
     },
 ]]--
      {
-        version = "1.0.3",
+        version = "1.1.0",
         improvements = {
             "Clean some legacy code"
 	},
         bugs = {},
 	features ={
-            "Add the Promote the Addon option"
+            "Add the Promote the Addon option",
+            "Add the Loot Group Roll option",
+            "Add the Pet/Toy/Mount/Recipe option"
 	}
     },
      {
