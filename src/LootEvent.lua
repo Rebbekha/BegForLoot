@@ -386,6 +386,10 @@ local XMOG_BY_CLASS = {
 
 }
 
+local MOUNT_SUBTYPE = 15
+local PET_SUBTYPE = 17
+local TOY_SUBTYPE = 3
+local RECIPE_SUBTYPE = 9
 
 ObjectList = ObjectList or {}
 local receivedItems = {}
@@ -414,109 +418,110 @@ debugLootEvent = false
   end
 
 local function GetFullItemInfo(item)
-    local ITEM_CLASSES_ALLOWED_PATTERN = _G.ITEM_CLASSES_ALLOWED:gsub('%%s', '(.+)')
-    local BIND_TRADE_TIME_REMAINING_PATTERN = _G.BIND_TRADE_TIME_REMAINING:gsub('%%s', '(.+)')
-    local TRANSMOGRIFY_TOOLTIP_APPEARANCE_UNKNOWN_PATTERN = _G.TRANSMOGRIFY_TOOLTIP_APPEARANCE_UNKNOWN:gsub('%%s', '(.+)')
+  local ITEM_CLASSES_ALLOWED_PATTERN = _G.ITEM_CLASSES_ALLOWED:gsub('%%s', '(.+)')
+  local BIND_TRADE_TIME_REMAINING_PATTERN = _G.BIND_TRADE_TIME_REMAINING:gsub('%%s', '(.+)')
+  local TRANSMOGRIFY_TOOLTIP_APPEARANCE_UNKNOWN_PATTERN = _G.TRANSMOGRIFY_TOOLTIP_APPEARANCE_UNKNOWN:gsub('%%s', '(.+)')
 
-    -- Modèles pour les objets liés au compte et au bataillon
-    local ITEM_BIND_TO_ACCOUNT_PATTERN = _G.ITEM_BIND_TO_ACCOUNT:gsub('%%s', '(.+)')
-    local ITEM_BIND_TO_ACCOUNT_UNTIL_EQUIP_PATTERN = _G.ITEM_BIND_TO_ACCOUNT_UNTIL_EQUIP:gsub('%%s', '(.+)')
-    local ITEM_BIND_TO_BNETACCOUNT_PATTERN = _G.ITEM_BIND_TO_BNETACCOUNT:gsub('%%s', '(.+)')
-    local ITEM_BNETACCOUNTBOUND_PATTERN = _G.ITEM_BNETACCOUNTBOUND:gsub('%%s', '(.+)')
+  -- Modèles pour les objets liés au compte et au bataillon
+  local ITEM_BIND_TO_ACCOUNT_PATTERN = _G.ITEM_BIND_TO_ACCOUNT:gsub('%%s', '(.+)')
+  local ITEM_BIND_TO_ACCOUNT_UNTIL_EQUIP_PATTERN = _G.ITEM_BIND_TO_ACCOUNT_UNTIL_EQUIP:gsub('%%s', '(.+)')
+  local ITEM_BIND_TO_BNETACCOUNT_PATTERN = _G.ITEM_BIND_TO_BNETACCOUNT:gsub('%%s', '(.+)')
+  local ITEM_BNETACCOUNTBOUND_PATTERN = _G.ITEM_BNETACCOUNTBOUND:gsub('%%s', '(.+)')
 
-    local fullItemInfo = {}
+  local fullItemInfo = {}
 
-    if item ~= nil then
-        fullItemInfo[FII_ITEM] = item
+  if item ~= nil then
+    fullItemInfo[FII_ITEM] = item
 
-        -- Récupération des informations de base
-        _, _, fullItemInfo[FII_QUALITY], fullItemInfo[FII_BASE_ILVL], fullItemInfo[FII_REQUIRED_LEVEL],
-        fullItemInfo[FII_TYPE], fullItemInfo[FII_SUB_TYPE], _, fullItemInfo[FII_ITEM_EQUIP_LOC], _,
-        _, fullItemInfo[FII_CLASS], fullItemInfo[FII_SUB_CLASS], fullItemInfo[FII_BIND_TYPE], _, _, _ = GetItemInfo(item)
+    -- Récupération des informations de base
+    _, _, fullItemInfo[FII_QUALITY], fullItemInfo[FII_BASE_ILVL], fullItemInfo[FII_REQUIRED_LEVEL], fullItemInfo[FII_TYPE], fullItemInfo[FII_SUB_TYPE], _, fullItemInfo[FII_ITEM_EQUIP_LOC], _, _, fullItemInfo[FII_CLASS], fullItemInfo[FII_SUB_CLASS], fullItemInfo[FII_BIND_TYPE], _, _, _ = GetItemInfo(item)
+  
+  -- Cas particuliers des Montures/Mascottes/Jouets/Recettes
+  local itemSubType = fullItemInfo[FII_SUB_TYPE]
+  if itemSubType == MOUNT_SUBTYPE or itemSubType == PET_SUBTYPE or itemSubType == TOY_SUBTYPE or itemSubType == RECIPE_SUBTYPE then
+    return fullItemInfo -- Retourner ici car aucune autre information n'est nécessaire pour ces sous-types
+  end
 
-        -- Détection si l'objet est équipable
-        fullItemInfo[FII_IS_EQUIPPABLE] = IsEquippableItem(item)
+  -- Détection si l'objet est équipable
+  fullItemInfo[FII_IS_EQUIPPABLE] = IsEquippableItem(item)
 
-        if fullItemInfo[FII_IS_EQUIPPABLE] then
-            -- Configurer le tooltip pour détecter les valeurs supplémentaires
-            tooltipLong = tooltipLong or CreateFrame("GameTooltip", "BFLScanTooltip", nil, "GameTooltipTemplate")
-            tooltipLong:SetOwner(WorldFrame, "ANCHOR_NONE")
-            tooltipLong:ClearLines()
-            tooltipLong:SetHyperlink(item)
-            tooltipLong.leftside = {}
-            local i = 1
-            while _G["BFLScanTooltipTextLeft" .. i] do
-                tooltipLong.leftside[i] = _G["BFLScanTooltipTextLeft" .. i]
-                i = i + 1
-            end
-
-            local realILVL = GetILVLFromTooltip(tooltipLong) or fullItemInfo[FII_BASE_ILVL]
-            fullItemInfo[FII_REAL_ILVL] = tonumber(realILVL)
-
-            local classes, hasBindTradeTimeWarning, hasSocket, hasAvoidance, hasIndestructible, hasLeech, hasSpeed, xmoggable, isBoundToAccount = nil, nil, false, false, false, false, false, false, false
-
-            local text
-            local index = 4
-            while tooltipLong.leftside[index] do
-                text = tooltipLong.leftside[index]:GetText()
-                
-                if text ~= nil then
-                    -- Recherche des mots-clés pour les liaisons au compte
-                    if text:find(ITEM_BIND_TO_ACCOUNT_PATTERN) or text:find(ITEM_BIND_TO_ACCOUNT_UNTIL_EQUIP_PATTERN) or 
-                       text:find(ITEM_BIND_TO_BNETACCOUNT_PATTERN) or text:find(ITEM_BNETACCOUNTBOUND_PATTERN) then
-                        isBoundToAccount = true
-                    end
-
-                    hasBindTradeTimeWarning = hasBindTradeTimeWarning or text:match(BIND_TRADE_TIME_REMAINING_PATTERN)
-                    classes = classes or text:match(ITEM_CLASSES_ALLOWED_PATTERN)
-                    hasSocket = hasSocket or text:find(_G.EMPTY_SOCKET_PRISMATIC) == 1
-                    hasAvoidance = hasAvoidance or text:find(_G.STAT_AVOIDANCE) ~= nil
-                    hasIndestructible = hasIndestructible or text:find(_G.STAT_STURDINESS) == 1
-                    hasLeech = hasLeech or text:find(_G.STAT_LIFESTEAL) ~= nil
-                    hasSpeed = hasSpeed or text:find(_G.STAT_SPEED) ~= nil
-                    xmoggable = xmoggable or text:find(TRANSMOGRIFY_TOOLTIP_APPEARANCE_UNKNOWN_PATTERN) ~= nil
-                end
-                index = index + 1
-            end
-
-            if classes ~= nil then
-                classes = string.upper(classes)
-                classes = string.gsub(classes, ' ', '')
-            end
-
-            -- Ajout des informations de liaison et des caractéristiques
-            fullItemInfo[FII_CLASSES] = classes
-            fullItemInfo[FII_TRADE_TIME_WARNING_SHOWN] = hasBindTradeTimeWarning
-            fullItemInfo[FII_HAS_SOCKET] = hasSocket
-            fullItemInfo[FII_HAS_AVOIDANCE] = hasAvoidance
-            fullItemInfo[FII_HAS_INDESTRUCTIBLE] = hasIndestructible
-            fullItemInfo[FII_HAS_LEECH] = hasLeech
-            fullItemInfo[FII_HAS_SPEED] = hasSpeed
-            fullItemInfo[FII_XMOGGABLE] = xmoggable
-            fullItemInfo[FII_IS_BOUND_TO_ACCOUNT] = isBoundToAccount  -- Détection de l'objet lié au compte
-        end
+  if fullItemInfo[FII_IS_EQUIPPABLE] then
+    -- Configurer le tooltip pour détecter les valeurs supplémentaires
+    tooltipLong = tooltipLong or CreateFrame("GameTooltip", "BFLScanTooltip", nil, "GameTooltipTemplate")
+    tooltipLong:SetOwner(WorldFrame, "ANCHOR_NONE")
+    tooltipLong:ClearLines()
+    tooltipLong:SetHyperlink(item)
+    tooltipLong.leftside = {}
+    local i = 1
+    while _G["BFLScanTooltipTextLeft" .. i] do
+      tooltipLong.leftside[i] = _G["BFLScanTooltipTextLeft" .. i]
+      i = i + 1
     end
 
-    return fullItemInfo
+    local realILVL = GetILVLFromTooltip(tooltipLong) or fullItemInfo[FII_BASE_ILVL] fullItemInfo[FII_REAL_ILVL] = tonumber(realILVL)
+
+    local classes, hasBindTradeTimeWarning, hasSocket, hasAvoidance, hasIndestructible, hasLeech, hasSpeed, xmoggable, isBoundToAccount = nil, nil, false, false, false, false, false, false, false
+
+    local text
+    local index = 4
+    while tooltipLong.leftside[index] do
+      text = tooltipLong.leftside[index]:GetText()
+                
+      if text ~= nil then
+        -- Recherche des mots-clés pour les liaisons au compte
+        if text:find(ITEM_BIND_TO_ACCOUNT_PATTERN) or text:find(ITEM_BIND_TO_ACCOUNT_UNTIL_EQUIP_PATTERN) or text:find(ITEM_BIND_TO_BNETACCOUNT_PATTERN) or text:find(ITEM_BNETACCOUNTBOUND_PATTERN) then
+          isBoundToAccount = true
+        end
+
+        hasBindTradeTimeWarning = hasBindTradeTimeWarning or text:match(BIND_TRADE_TIME_REMAINING_PATTERN)
+        classes = classes or text:match(ITEM_CLASSES_ALLOWED_PATTERN)
+        hasSocket = hasSocket or text:find(_G.EMPTY_SOCKET_PRISMATIC) == 1
+        hasAvoidance = hasAvoidance or text:find(_G.STAT_AVOIDANCE) ~= nil
+        hasIndestructible = hasIndestructible or text:find(_G.STAT_STURDINESS) == 1
+        hasLeech = hasLeech or text:find(_G.STAT_LIFESTEAL) ~= nil
+        hasSpeed = hasSpeed or text:find(_G.STAT_SPEED) ~= nil
+        xmoggable = xmoggable or text:find(TRANSMOGRIFY_TOOLTIP_APPEARANCE_UNKNOWN_PATTERN) ~= nil
+      end
+      index = index + 1
+    end
+
+    if classes ~= nil then
+      classes = string.upper(classes)
+      classes = string.gsub(classes, ' ', '')
+    end
+
+    -- Ajout des informations de liaison et des caractéristiques
+    fullItemInfo[FII_CLASSES] = classes
+    fullItemInfo[FII_TRADE_TIME_WARNING_SHOWN] = hasBindTradeTimeWarning
+    fullItemInfo[FII_HAS_SOCKET] = hasSocket
+    fullItemInfo[FII_HAS_AVOIDANCE] = hasAvoidance
+    fullItemInfo[FII_HAS_INDESTRUCTIBLE] = hasIndestructible
+    fullItemInfo[FII_HAS_LEECH] = hasLeech
+    fullItemInfo[FII_HAS_SPEED] = hasSpeed
+    fullItemInfo[FII_XMOGGABLE] = xmoggable
+    fullItemInfo[FII_IS_BOUND_TO_ACCOUNT] = isBoundToAccount  -- Détection de l'objet lié au compte
+    end
+  end
+
+  return fullItemInfo
 end
 
 local function IsTradeable(fullItemInfo)
-    local noTradeBindOnEquip = SavedVariables:Get().noTradeBindOnEquip
+  local noTradeBindOnEquip = SavedVariables:Get().noTradeBindOnEquip
+  
+  -- Vérification de l'objet lié au compte/bataillon
+  if fullItemInfo[FII_IS_BOUND_TO_ACCOUNT] then
+    return false
+  end
 
-    -- Vérification de l'objet lié au compte/bataillon
-    if fullItemInfo[FII_IS_BOUND_TO_ACCOUNT] then
-        return false
-    end
-
-    -- Logique existante pour les objets échangeables
-    if (fullItemInfo[FII_QUALITY] == Enum.ItemQuality.Rare or fullItemInfo[FII_QUALITY] == Enum.ItemQuality.Epic) 
-        and fullItemInfo[FII_BIND_TYPE] == 1 then
-        return true
-    elseif fullItemInfo[FII_BIND_TYPE] == 2 and not noTradeBindOnEquip then
-        return true
-    else
-        return false
-    end
+  -- Logique existante pour les objets échangeables
+  if (fullItemInfo[FII_QUALITY] == Enum.ItemQuality.Rare or fullItemInfo[FII_QUALITY] == Enum.ItemQuality.Epic) and fullItemInfo[FII_BIND_TYPE] == 1 then
+    return true
+  elseif fullItemInfo[FII_BIND_TYPE] == 2 and not noTradeBindOnEquip then
+    return true
+  else
+    return false
+  end
 end
 
 local function GetItemPrimaryAttribute(item)
@@ -694,14 +699,11 @@ end
 
 local function CanClassUseItem(fullItemInfo, playerClass)
   -- Vérifie si l'objet est équipé par une des classes éligibles
-  --print("Entrer dans la boucle CanClassUseItem")
-  --print(playerClass)
   
-  
-	--If it's an offhand everyclass can learn it
-	if (fullItemInfo[FII_ITEM_EQUIP_LOC] == 'INVTYPE_HAND' or fullItemInfo[FII_ITEM_EQUIP_LOC] == 'INVTYPE_CLOAK' or fullItemInfo[FII_ITEM_EQUIP_LOC] == 'INVTYPE_FINGER' or fullItemInfo[FII_ITEM_EQUIP_LOC] == 'INVTYPE_NECK' or fullItemInfo[FII_ITEM_EQUIP_LOC] == 'INVTYPE_TRINKET') then
-      return true
-	end
+  --If it's an offhand everyclass can learn it
+  if (fullItemInfo[FII_ITEM_EQUIP_LOC] == 'INVTYPE_HAND' or fullItemInfo[FII_ITEM_EQUIP_LOC] == 'INVTYPE_CLOAK' or fullItemInfo[FII_ITEM_EQUIP_LOC] == 'INVTYPE_FINGER' or fullItemInfo[FII_ITEM_EQUIP_LOC] == 'INVTYPE_NECK' or fullItemInfo[FII_ITEM_EQUIP_LOC] == 'INVTYPE_TRINKET') then
+    return true
+  end
 	
   local index = nil
   --On regarde quelle classe correspond
@@ -913,17 +915,24 @@ EventManager:On("ENCOUNTER_LOOT_RECEIVED", function(encounterID, itemID, itemLin
   
   --Check if the item have an ilvl and is tradeable
   if fullItemInfo == nil then return print("fulliteminfo is nil") end 
-    -- Check if the item is equippable and tradeable
-  if fullItemInfo[FII_REAL_ILVL] == nil then
-  --print("pas d'ilvl non equipable")
-  return
-  end
+
     -- If the item is not tradeable, exit
   if not IsTradeable(fullItemInfo)then 
   --print("Item not Tradeable")  
   return
   end
-  
+
+  -- Check if the item is equippable and tradeable and not in particuliar option
+  local itemSubType = fullItemInfo[FII_SUB_TYPE]
+  local CasParticulier = itemSubType == MOUNT_SUBTYPE or itemSubType == PET_SUBTYPE or itemSubType == TOY_SUBTYPE or itemSubType == RECIPE_SUBTYPE
+  if CasParticulier then
+  else
+    if fullItemInfo[FII_REAL_ILVL] == nil then
+    --print("pas d'ilvl non equipable")
+      return
+    end
+  end
+		
   --Code 
   local myName = UnitName("player") -- Get the name of the current player
   local _, myClass = UnitClass('player')
@@ -939,7 +948,46 @@ EventManager:On("ENCOUNTER_LOOT_RECEIVED", function(encounterID, itemID, itemLin
     local transmogUnknownForAllClass = SavedVariables:Get().transmogUnknownForAllClass
     local transmogUnknownForMyClass = SavedVariables:Get().transmogUnknownForMyClass
     local transmogUnknownForMySpec = SavedVariables:Get().transmogUnknownForMySpec
+    local optionMount = SavedVariables:Get().optionMount
+    local optionPet = SavedVariables:Get().optionPet
+    local optionRecipe = SavedVariables:Get().optionRecipe
+    local optionToy = SavedVariables:Get().optionToy
 	
+    --Option Pet
+    if optionPet then
+	  local speciesID = C_PetJournal.FindPetIDByID(itemID)
+      local numCollected = speciesID and C_PetJournal.GetNumCollectedInfo(speciesID) or 0
+      if numCollected == 0 then
+        AddObjectlist(fullItemInfo, playerName, 'Pet')
+        return
+      end
+    end
+	
+    --Option Mount
+    --Add the mount only if you don't have it
+    if optionMount then
+	  local mountID = C_MountJournal.GetMountFromItem(itemID)
+      if mountID and not select(11, C_MountJournal.GetMountInfoByID(mountID)) then
+        AddObjectlist(fullItemInfo, playerName, 'Mount')
+        return
+      end
+    end	
+	
+    --Option Toy
+    --Add the toy only if you don't have it
+    if optionToy then
+	  if not PlayerHasToy(itemID) then
+        AddObjectlist(fullItemInfo, playerName, 'Toy')
+        return
+      end
+    end
+	
+    --Option Recipe
+    --Add the all recipe. No filter applicate yet
+    if optionRecipe then
+	  AddObjectlist(fullItemInfo, playerName, 'Recipe')
+    end	
+
 	
 	--Option Ilvl Upgrade
     if ilvlUpgrade then
@@ -1081,23 +1129,30 @@ EventManager:On("ROLL_END", function(rollID, winnerName, itemID)
   local playerName = winnerName
   local itemLink = GetItemLink(itemID) -- Get the item link using the item ID
 		
-  -- Get full item information using the GetFullItemInfo function
+ -- Get full item information using the GetFullItemInfo functionZ
   local fullItemInfo = GetFullItemInfo(itemLink)
   
   
   --Check if the item have an ilvl and is tradeable
   if fullItemInfo == nil then return print("fulliteminfo is nil") end 
-    -- Check if the item is equippable and tradeable
-  if fullItemInfo[FII_REAL_ILVL] == nil then
-  --print("pas d'ilvl non equipable")
-  return
-  end
+
     -- If the item is not tradeable, exit
   if not IsTradeable(fullItemInfo)then 
   --print("Item not Tradeable")  
   return
   end
-  
+
+  -- Check if the item is equippable and tradeable and not in particuliar option
+  local itemSubType = fullItemInfo[FII_SUB_TYPE]
+  local CasParticulier = itemSubType == MOUNT_SUBTYPE or itemSubType == PET_SUBTYPE or itemSubType == TOY_SUBTYPE or itemSubType == RECIPE_SUBTYPE
+  if CasParticulier then
+  else
+    if fullItemInfo[FII_REAL_ILVL] == nil then
+    --print("pas d'ilvl non equipable")
+      return
+    end
+  end
+		
   --Code 
   local myName = UnitName("player") -- Get the name of the current player
   local _, myClass = UnitClass('player')
@@ -1105,7 +1160,7 @@ EventManager:On("ROLL_END", function(rollID, winnerName, itemID)
   -- The loot is from other
   if playerName ~= myName then
     -- Retrieve user-selected options from saved variables
-    local ilvlUpgrade = SavedVariables:Get().ilvlUpgrade.enabled
+	local ilvlUpgrade = SavedVariables:Get().ilvlUpgrade.enabled
     local ilvlBelow = SavedVariables:Get().ilvlUpgrade.value
     local TransmogUnknown = SavedVariables:Get().transmogUnknown
     local transmogUnknownAppearanceOnly = SavedVariables:Get().transmogUnknownAppearanceOnly
@@ -1113,7 +1168,46 @@ EventManager:On("ROLL_END", function(rollID, winnerName, itemID)
     local transmogUnknownForAllClass = SavedVariables:Get().transmogUnknownForAllClass
     local transmogUnknownForMyClass = SavedVariables:Get().transmogUnknownForMyClass
     local transmogUnknownForMySpec = SavedVariables:Get().transmogUnknownForMySpec
+    local optionMount = SavedVariables:Get().optionMount
+    local optionPet = SavedVariables:Get().optionPet
+    local optionRecipe = SavedVariables:Get().optionRecipe
+    local optionToy = SavedVariables:Get().optionToy
 	
+    --Option Pet
+    if optionPet then
+	  local speciesID = C_PetJournal.FindPetIDByID(itemID)
+      local numCollected = speciesID and C_PetJournal.GetNumCollectedInfo(speciesID) or 0
+      if numCollected == 0 then
+        AddObjectlist(fullItemInfo, playerName, 'Pet')
+        return
+      end
+    end
+	
+    --Option Mount
+    --Add the mount only if you don't have it
+    if optionMount then
+	  local mountID = C_MountJournal.GetMountFromItem(itemID)
+      if mountID and not select(11, C_MountJournal.GetMountInfoByID(mountID)) then
+        AddObjectlist(fullItemInfo, playerName, 'Mount')
+        return
+      end
+    end	
+	
+    --Option Toy
+    --Add the toy only if you don't have it
+    if optionToy then
+	  if not PlayerHasToy(itemID) then
+        AddObjectlist(fullItemInfo, playerName, 'Toy')
+        return
+      end
+    end
+	
+    --Option Recipe
+    --Add the all recipe. No filter applicate yet
+    if optionRecipe then
+	  AddObjectlist(fullItemInfo, playerName, 'Recipe')
+    end	
+
 	
 	--Option Ilvl Upgrade
     if ilvlUpgrade then
