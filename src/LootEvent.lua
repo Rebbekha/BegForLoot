@@ -1131,7 +1131,7 @@ EventManager:On("GROUP_LEFT", function()
 end)
 
 -- Registering the CHAT_MSG_LOOT event
-EventManager:On("CHAT_MSG_LOOT", function(message, playerfullname)
+EventManager:On("CHAT_MSG_LOOT", function(message, playerfullname, ...)
   -- Check if lootListening is active
   if not lootListening then return end
   
@@ -1176,7 +1176,7 @@ EventManager:On("CHAT_MSG_LOOT", function(message, playerfullname)
   end
 end)
 
-EventManager:On(E.WinnerFound, function(playername, itemLink)
+EventManager:On(E.WinnerFound, function(playerName, itemLink)
   -- Check if the player is fully loaded : uselful for player with low config
   if not playerReady then
     return -- Exit if the player is not fully loaded
