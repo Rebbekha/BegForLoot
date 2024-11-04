@@ -43,6 +43,41 @@ local patchNotes = {
         }
     },
 ]]--
+
+     {
+        version = "1.1.3",
+        improvements = {
+            "Clean some legacy code"
+	},
+        bugs = {
+	    "Fixed the Pet/mount/toy/recipe option"
+	},
+	features ={
+	}
+    },
+
+     {
+        version = "1.1.2",
+        improvements = {
+            "Clean some legacy code"
+	},
+        bugs = {
+	    "Fixed the Pet/mount/toy/recipe option"
+	},
+	features ={
+	}
+    },
+     {
+        version = "1.1.1",
+        improvements = {
+            "Clean some legacy code"
+	},
+        bugs = {
+	   "Fixed the Loot Group Roll bug"
+	},
+	features ={
+	}
+    },
      {
         version = "1.1.0",
         improvements = {
