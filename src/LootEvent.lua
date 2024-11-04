@@ -417,15 +417,15 @@ local function GetFullItemInfo(item)
     -- Récupération des informations de base
     _, _, fullItemInfo[FII_QUALITY], fullItemInfo[FII_BASE_ILVL], fullItemInfo[FII_REQUIRED_LEVEL], fullItemInfo[FII_TYPE], fullItemInfo[FII_SUB_TYPE], _, fullItemInfo[FII_ITEM_EQUIP_LOC], _, _, fullItemInfo[FII_CLASS], fullItemInfo[FII_SUB_CLASS], fullItemInfo[FII_BIND_TYPE], _, _, _ = GetItemInfo(item)
   
-  -- Special cases for Mounts/Pets/Toys/Recipes
+  -- Special cases for Mounts/Pets/Recipes
   local itemClass = fullItemInfo[FII_CLASS]
   local itemSubClass = fullItemInfo[FII_SUB_CLASS]
+  local itemID = tonumber(string.match(item, "item:(%d+)"))
 
-  -- Check for mounts, pets, toys, and recipes using classID and subclassID
+  -- Check for mounts, pets and recipes using classID and subclassID
   if (itemClass == 15 and itemSubClass == 5) or         -- Mount
     (itemClass == 17 and itemSubClass == 2) or         -- Pet
-    (itemClass == 9) or                                -- Recipe
-    (C_ToyBox.IsToyUsable(item)) then                  -- Toy (using ToyBox API for toys)
+    (itemClass == 9) then                                -- Recipe          
     return fullItemInfo -- Return here as no further information is needed for these subtypes
   end
 
@@ -925,15 +925,15 @@ EventManager:On("ENCOUNTER_LOOT_RECEIVED", function(encounterID, itemID, itemLin
   return
   end
 
-  -- Special cases for Mounts/Pets/Toys/Recipes
+  -- Special cases for Mounts/Pets/Recipes
   local itemClass = fullItemInfo[FII_CLASS]
   local itemSubClass = fullItemInfo[FII_SUB_CLASS]
 
-  -- Check the ilvl if it's not a mounts, pets, toys, and recipes 
+  -- Check the ilvl if it's not a mounts, pets and recipes 
   if not ( (itemClass == 15 and itemSubClass == 5) or    -- Mount
          (itemClass == 17 and itemSubClass == 2) or    -- Pet
-         (itemClass == 9) or                           -- Recipe
-         (C_ToyBox.IsToyUsable(item)) ) then           -- Toy (using ToyBox API for toys)
+         (itemClass == 9) then                         -- Recipe
+                     
     if fullItemInfo[FII_REAL_ILVL] == nil then
     --print("pas d'ilvl non equipable")
       return
@@ -958,7 +958,7 @@ EventManager:On("ENCOUNTER_LOOT_RECEIVED", function(encounterID, itemID, itemLin
     local optionMount = SavedVariables:Get().optionMount
     local optionPet = SavedVariables:Get().optionPet
     local optionRecipe = SavedVariables:Get().optionRecipe
-    local optionToy = SavedVariables:Get().optionToy
+    
 
     -- Option Pet
     if optionPet and itemClass == 17 and itemSubClass == 2 then
@@ -979,15 +979,6 @@ EventManager:On("ENCOUNTER_LOOT_RECEIVED", function(encounterID, itemID, itemLin
         return
       end
     end  
-
-    -- Option Toy
-    -- Add the toy only if you don't have it
-    if optionToy and C_ToyBox.IsToyUsable(itemID) then
-      if not PlayerHasToy(itemID) then
-        AddObjectlist(fullItemInfo, playerName, 'Toy')
-        return
-      end
-    end
 
     -- Option Recipe
     -- Add the recipe regardless (no filter applied yet)
@@ -1185,15 +1176,15 @@ EventManager:On("CHAT_MSG_LOOT", function(message, playerName, ...)
     return
   end
 
-  -- Special cases for Mounts/Pets/Toys/Recipes
+  -- Special cases for Mounts/Pets/Recipes
   local itemClass = fullItemInfo[FII_CLASS]
   local itemSubClass = fullItemInfo[FII_SUB_CLASS]
+  local itemID = tonumber(string.match(itemLink, "item:(%d+)"))
 
-  -- Check the ilvl if it's not a mounts, pets, toys, and recipes 
+  -- Check the ilvl if it's not a mounts, pets and recipes 
   if not ( (itemClass == 15 and itemSubClass == 5) or    -- Mount
          (itemClass == 17 and itemSubClass == 2) or    -- Pet
-         (itemClass == 9) or                           -- Recipe
-         (C_ToyBox.IsToyUsable(item)) ) then           -- Toy (using ToyBox API for toys)
+         (itemClass == 9) then                           -- Recipe
     if fullItemInfo[FII_REAL_ILVL] == nil then
     --print("pas d'ilvl non equipable")
       return
@@ -1219,8 +1210,6 @@ EventManager:On("CHAT_MSG_LOOT", function(message, playerName, ...)
     local optionMount = SavedVariables:Get().optionMount
     local optionPet = SavedVariables:Get().optionPet
     local optionRecipe = SavedVariables:Get().optionRecipe
-    local optionToy = SavedVariables:Get().optionToy
-
 
     -- Option Pet
     if optionPet and itemClass == 17 and itemSubClass == 2 then
@@ -1241,15 +1230,6 @@ EventManager:On("CHAT_MSG_LOOT", function(message, playerName, ...)
         return
       end
     end  
-
-    -- Option Toy
-    -- Add the toy only if you don't have it
-    if optionToy and C_ToyBox.IsToyUsable(itemID) then
-      if not PlayerHasToy(itemID) then
-        AddObjectlist(fullItemInfo, playerName, 'Toy')
-        return
-      end
-    end
 
     -- Option Recipe
     -- Add the recipe regardless (no filter applied yet)
