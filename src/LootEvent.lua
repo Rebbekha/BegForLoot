@@ -957,7 +957,7 @@ EventManager:On("ENCOUNTER_LOOT_RECEIVED", function(encounterID, itemID, itemLin
     local optionToy = SavedVariables:Get().optionToy
 	
     --Option Pet
-    if optionPet then
+    if optionPet and itemSubType == PET_SUBTYPE then
 	  local speciesID = C_PetJournal.FindPetIDByID(itemID)
       local numCollected = speciesID and C_PetJournal.GetNumCollectedInfo(speciesID) or 0
       if numCollected == 0 then
@@ -968,7 +968,7 @@ EventManager:On("ENCOUNTER_LOOT_RECEIVED", function(encounterID, itemID, itemLin
 	
     --Option Mount
     --Add the mount only if you don't have it
-    if optionMount then
+    if optionMount and itemSubType == MOUNT_SUBTYPE then
 	  local mountID = C_MountJournal.GetMountFromItem(itemID)
       if mountID and not select(11, C_MountJournal.GetMountInfoByID(mountID)) then
         AddObjectlist(fullItemInfo, playerName, 'Mount')
@@ -978,7 +978,7 @@ EventManager:On("ENCOUNTER_LOOT_RECEIVED", function(encounterID, itemID, itemLin
 	
     --Option Toy
     --Add the toy only if you don't have it
-    if optionToy then
+    if optionToy and itemSubType == TOY_SUBTYPE then
 	  if not PlayerHasToy(itemID) then
         AddObjectlist(fullItemInfo, playerName, 'Toy')
         return
@@ -987,7 +987,7 @@ EventManager:On("ENCOUNTER_LOOT_RECEIVED", function(encounterID, itemID, itemLin
 	
     --Option Recipe
     --Add the all recipe. No filter applicate yet
-    if optionRecipe then
+    if optionRecipe and itemSubType == RECIPE_SUBTYPE then
 	  AddObjectlist(fullItemInfo, playerName, 'Recipe')
     end	
 
