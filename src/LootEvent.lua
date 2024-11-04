@@ -932,7 +932,7 @@ EventManager:On("ENCOUNTER_LOOT_RECEIVED", function(encounterID, itemID, itemLin
   -- Check the ilvl if it's not a mounts, pets and recipes 
   if not ( (itemClass == 15 and itemSubClass == 5) or    -- Mount
          (itemClass == 17 and itemSubClass == 2) or    -- Pet
-         (itemClass == 9) then                         -- Recipe
+         (itemClass == 9)) then                         -- Recipe
                      
     if fullItemInfo[FII_REAL_ILVL] == nil then
     --print("pas d'ilvl non equipable")
@@ -1184,7 +1184,7 @@ EventManager:On("CHAT_MSG_LOOT", function(message, playerName, ...)
   -- Check the ilvl if it's not a mounts, pets and recipes 
   if not ( (itemClass == 15 and itemSubClass == 5) or    -- Mount
          (itemClass == 17 and itemSubClass == 2) or    -- Pet
-         (itemClass == 9) then                           -- Recipe
+         (itemClass == 9)) then                           -- Recipe
     if fullItemInfo[FII_REAL_ILVL] == nil then
     --print("pas d'ilvl non equipable")
       return
