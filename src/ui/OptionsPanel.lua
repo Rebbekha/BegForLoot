@@ -50,9 +50,9 @@ local patchNotes = {
             "Clean some legacy code"
 	},
         bugs = {
-	    "Fixed the Pet/mount/toy/recipe option"
 	},
 	features ={
+	   "Delete the toy option (it's only for 1-2 bosses and the api isn't friendly"
 	}
     },
 
