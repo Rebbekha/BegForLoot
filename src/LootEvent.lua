@@ -395,7 +395,6 @@ ObjectList = ObjectList or {}
 local receivedItems = {}
 
 local lootListening = false
-local LootRollWinners = {}
 
 debugLootEvent = false
 
@@ -1127,56 +1126,21 @@ end)
 -- Quand on a quitter le group on ne peux plus savoir qui a fait les rolls donc on nettoie tous et on arrete de traiter chaque message
 EventManager:On("GROUP_LEFT", function()
   lootListening = false
-  LootRollWinners = {} -- Clear the LootRollWinners table when leaving the group
+end)
+
+
+EventManager:On("GROUP_JOINED", function()
+  lootListening = false
 end)
 
 -- Registering the CHAT_MSG_LOOT event
-EventManager:On("CHAT_MSG_LOOT", function(message, playerfullname, ...)
+EventManager:On("CHAT_MSG_LOOT", function(message, playerName, ...)
+  --print("CHAT_MSG_LOOT")
   -- Check if lootListening is active
-  if not lootListening then return end
-  
-  -- Check if playerfullname is nil or empty
-  if playerfullname == nil or playerfullname == "" then
-    -- Check if the message starts with "[" and contains "] : ", and if the end of the message is an item link
-    if message:sub(1, 1) == "[" and message:find("] : ") and message:match("|c%x+|H(.+)|h%[(.+)%]|h|r$") then
-      -- Extract the player name without the server name
-      local playerwithoutservername = message:match("] : (.+)%s*%(") -- Retrieve the player name
-      -- Extract the item link
-      local itemlink = message:match("|c%x+|H(.+)|h%[(.+)%]|h|r$") -- Extracts the item link
+  if not lootListening then 
+  --print( "lootListening = false")
+  return end
 
-      -- Store both variables in the LootRollWinners table
-      if not LootRollWinners[playerwithoutservername] then
-        LootRollWinners[playerwithoutservername] = {}
-      end
-      
-      table.insert(LootRollWinners[playerwithoutservername], itemlink)
-
-    else
-      return -- Exit if conditions are not met
-    end
-
-  else
-    -- Check if playerfullname can find a matching name in LootRollWinners
-    for playerName, items in pairs(LootRollWinners) do
-      if playerfullname:find(playerName) then -- Check if the full name matches a player
-        for index, item in ipairs(items) do
-          if item then
-            -- Trigger the WinnerFound event for each matching item
-            EventManager:Fire(E.WinnerFound(playerfullname, item))
-            -- Remove the item from the list after processing it
-            table.remove(items, index)
-            break -- Exit the loop once the item is processed to avoid index issues
-          end
-        end
-        return -- Exit once a match is found
-      end
-    end
-
-    return -- Exit if no match was found
-  end
-end)
-
-EventManager:On(E.WinnerFound, function(playerName, itemLink)
   -- Check if the player is fully loaded : uselful for player with low config
   if not playerReady then
     return -- Exit if the player is not fully loaded
@@ -1187,16 +1151,27 @@ EventManager:On(E.WinnerFound, function(playerName, itemLink)
     return -- Exit we don't want to whisper the winner of the group loot
   end
 		
- -- Get full item information using the GetFullItemInfo functionZ
+if playerName == nil or  playerName == "" then
+return
+--print("playerName == nil")
+else
+     -- Extract the item link
+	-- print("playerName != nil")
+      local itemLink = message:match("|c%x+|H(.+)|h%[(.+)%]|h|r$") -- Extracts the item link
+end		
+ -- Get full item information using the GetFullItemInfo function
   local fullItemInfo = GetFullItemInfo(itemLink)
   
   
   --Check if the item have an ilvl and is tradeable
-  if fullItemInfo == nil then return print("fulliteminfo is nil") end 
+  if fullItemInfo == nil then 
+    --print("fulliteminfo is nil") 
+    return 
+  end 
 
     -- If the item is not tradeable, exit
   if not IsTradeable(fullItemInfo)then 
-  --print("Item not Tradeable")  
+  print("Item not Tradeable")  
   return
   end
 
@@ -1206,7 +1181,7 @@ EventManager:On(E.WinnerFound, function(playerName, itemLink)
   if CasParticulier then
   else
     if fullItemInfo[FII_REAL_ILVL] == nil then
-    --print("pas d'ilvl non equipable")
+      print("pas d'ilvl non equipable")
       return
     end
   end
@@ -1215,6 +1190,7 @@ EventManager:On(E.WinnerFound, function(playerName, itemLink)
   local myName = UnitName("player") -- Get the name of the current player
   local _, myClass = UnitClass('player')
   
+  --print(playerName)
   -- The loot is from other
   if playerName ~= myName then
     -- Retrieve user-selected options from saved variables
@@ -1232,7 +1208,7 @@ EventManager:On(E.WinnerFound, function(playerName, itemLink)
     local optionToy = SavedVariables:Get().optionToy
 	
     --Option Pet
-    if optionPet then
+    if optionPet and itemSubType == PET_SUBTYPE then
 	  local speciesID = C_PetJournal.FindPetIDByID(itemID)
       local numCollected = speciesID and C_PetJournal.GetNumCollectedInfo(speciesID) or 0
       if numCollected == 0 then
@@ -1243,7 +1219,7 @@ EventManager:On(E.WinnerFound, function(playerName, itemLink)
 	
     --Option Mount
     --Add the mount only if you don't have it
-    if optionMount then
+    if optionMount and itemSubType == MOUNT_SUBTYPE then
 	  local mountID = C_MountJournal.GetMountFromItem(itemID)
       if mountID and not select(11, C_MountJournal.GetMountInfoByID(mountID)) then
         AddObjectlist(fullItemInfo, playerName, 'Mount')
@@ -1253,7 +1229,7 @@ EventManager:On(E.WinnerFound, function(playerName, itemLink)
 	
     --Option Toy
     --Add the toy only if you don't have it
-    if optionToy then
+    if optionToy and itemSubType == TOY_SUBTYPE then
 	  if not PlayerHasToy(itemID) then
         AddObjectlist(fullItemInfo, playerName, 'Toy')
         return
@@ -1262,7 +1238,7 @@ EventManager:On(E.WinnerFound, function(playerName, itemLink)
 	
     --Option Recipe
     --Add the all recipe. No filter applicate yet
-    if optionRecipe then
+    if optionRecipe and itemSubType == RECIPE_SUBTYPE then
 	  AddObjectlist(fullItemInfo, playerName, 'Recipe')
     end	
 
