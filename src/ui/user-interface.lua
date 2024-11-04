@@ -102,12 +102,6 @@ UserInterface.frame = (function()
     get = function() return SavedVariables:Get().optionPet end,
     set = function(value) SavedVariables:Get().optionPet = value end
   })
-  frame.optionsFrame:AddOption({								---Option Toy
-    labelText = L.OPTION_TOY_TEXT,
-    tooltipText = L.OPTION_TOY_TEXT_TOOLTIP,
-    get = function() return SavedVariables:Get().optionToy end,
-    set = function(value) SavedVariables:Get().optionToy = value end
-  })
   frame.optionsFrame:AddOption({								--- Option Mount
     labelText = L.OPTION_MOUNT_TEXT,
     tooltipText = L.OPTION_MOUNT_TEXT_TOOLTIP,
