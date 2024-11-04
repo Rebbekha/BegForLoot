@@ -19,7 +19,6 @@ local function globalDefaults()
   GroupLoot = true,
   optionMount = true,
   optionPet = true,
-  optionToy = true,
   optionRecipe = true,
     
   -- Offering Loot Option.
