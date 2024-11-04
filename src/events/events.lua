@@ -12,7 +12,6 @@ local events = {
   "SavedVariablesReady",
   "NewObjectList",
   "NewReceivedItems",
-  "WinnerFound",
   "UpdateText"
 }
 
@@ -30,5 +29,6 @@ E.Wow = {
   PlayerLogout = "PLAYER_LOGOUT",
   ChatMsgLoot = "CHAT_MSG_LOOT",
   LootHistoryUpdateDrop = "LOOT_HISTORY_UPDATE_DROP",
+  Groupjoined = "GROUP_JOINED",
   GroupLeft = "GROUP_LEFT"
 }
