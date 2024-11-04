@@ -13,7 +13,7 @@ local LootedItemFrame = Addon:GetModule("LootedItemFrame")
 
      -----------------------------------------------------------------------
      ------------------ DEFINE CONSTANT AND MAPPINGS -----------------------
-	 -----------------------------------------------------------------------
+     -----------------------------------------------------------------------
 	 
 -- Keys for the array returned by GetFullItemInfo()
 local FII_ITEM						= 'ITEM'						-- item link
@@ -50,53 +50,53 @@ local FII_IS_BOUND_TO_ACCOUNT		= "IS_BOUND_TO_ACCOUNT"			-- true if the item is 
 
 local DEATH_KNIGHT					= select(2, GetClassInfo(6))
 local DEMON_HUNTER					= select(2, GetClassInfo(12))
-local DRUID							= select(2, GetClassInfo(11))
+local DRUID						= select(2, GetClassInfo(11))
 local EVOKER						= select(2, GetClassInfo(13))
 local HUNTER						= select(2, GetClassInfo(3))
-local MAGE							= select(2, GetClassInfo(8))
-local MONK							= select(2, GetClassInfo(10))
+local MAGE						= select(2, GetClassInfo(8))
+local MONK						= select(2, GetClassInfo(10))
 local PALADIN						= select(2, GetClassInfo(2))
 local PRIEST						= select(2, GetClassInfo(5))
-local ROGUE							= select(2, GetClassInfo(4))
+local ROGUE						= select(2, GetClassInfo(4))
 local SHAMAN						= select(2, GetClassInfo(7))
 local WARLOCK						= select(2, GetClassInfo(9))
 local WARRIOR						= select(2, GetClassInfo(1))
 
 local SPECS = {
-	DK_BLOOD						= 250,
-	DK_FROST						= 251,
-	DK_UNHOLY						= 252,
-	DH_HAVOC						= 577,
+	DK_BLOOD					= 250,
+	DK_FROST					= 251,
+	DK_UNHOLY					= 252,
+	DH_HAVOC					= 577,
 	DH_VENGEANCE					= 581,
 	DRUID_BALANCE					= 102,
-	DRUID_FERAL						= 103,
+	DRUID_FERAL					= 103,
 	DRUID_GUARDIAN					= 104,
-	DRUID_RESTO						= 105,
-	EVOKER_DEVA						= 1467,
-	EVOKER_PRES						= 1468,
-	EVOKER_AUG						= 1473,
-	HUNTER_BM						= 253,
+	DRUID_RESTO					= 105,
+	EVOKER_DEVA					= 1467,
+	EVOKER_PRES					= 1468,
+	EVOKER_AUG					= 1473,
+	HUNTER_BM					= 253,
 	HUNTER_MARKS					= 254,
 	HUNTER_SURVIVAL					= 255,
-	MAGE_ARCANE						= 62,
-	MAGE_FIRE						= 63,
-	MAGE_FROST						= 64,
-	MONK_BM							= 268,
-	MONK_MW							= 270,
-	MONK_WW							= 269,
+	MAGE_ARCANE					= 62,
+	MAGE_FIRE					= 63,
+	MAGE_FROST					= 64,
+	MONK_BM						= 268,
+	MONK_MW						= 270,
+	MONK_WW						= 269,
 	PALADIN_HOLY					= 65,
 	PALADIN_PROT					= 66,
-	PALADIN_RET						= 70,
-	PRIEST_DISC						= 256,
-	PRIEST_HOLY						= 257,
+	PALADIN_RET					= 70,
+	PRIEST_DISC					= 256,
+	PRIEST_HOLY					= 257,
 	PRIEST_SHADOW					= 258,
-	ROGUE_ASS						= 259,
+	ROGUE_ASS					= 259,
 	ROGUE_OUTLAW					= 260,
-	ROGUE_SUB						= 261,
-	SHAMAN_ELE						= 262,
-	SHAMAN_ENH						= 263,
+	ROGUE_SUB					= 261,
+	SHAMAN_ELE					= 262,
+	SHAMAN_ENH					= 263,
 	SHAMAN_RESTO					= 264,
-	WARLOCK_AFF						= 256,
+	WARLOCK_AFF					= 256,
 	WARLOCK_DEMO					= 266,
 	WARLOCK_DESTRO					= 267,
 	WARRIOR_ARMS					= 71,
@@ -107,24 +107,24 @@ local SPECS = {
 local SPEC_BY_CLASS = {
 	[DEATH_KNIGHT]					= { SPECS.DK_BLOOD, SPECS.DK_FROST, SPECS.DK_UNHOLY },
 	[DEMON_HUNTER]					= { SPECS.DH_HAVOC, SPECS.DH_VENGEANCE },
-	[DRUID]							= { SPECS.DRUID_BALANCE, SPECS.DRUID_FERAL, SPECS.DRUID_GUARDIAN, SPECS.DRUID_RESTO },
-	[EVOKER]						= { SPECS.EVOKER_DEVA, SPECS.EVOKER_PRES, SPECS.EVOKER_AUG },
-	[HUNTER]						= { SPECS.HUNTER_BM, SPECS.HUNTER_MARKS, SPECS.HUNTER_SURVIVAL },
-	[MAGE]							= { SPECS.MAGE_ARCANE, SPECS.MAGE_FIRE, SPECS.MAGE_FROST },
-	[MONK]							= { SPECS.MONK_BM, SPECS.MONK_MW, SPECS.MONK_WW },
-	[PALADIN]						= { SPECS.PALADIN_HOLY, SPECS.PALADIN_PROT, SPECS.PALADIN_RET },
-	[PRIEST]						= { SPECS.PRIEST_DISC, SPECS.PRIEST_HOLY, SPECS.PRIEST_SHADOW },
-	[ROGUE]							= { SPECS.ROGUE_ASS, SPECS.ROGUE_OUTLAW, SPECS.ROGUE_SUB },
-	[SHAMAN]						= { SPECS.SHAMAN_ELE, SPECS.SHAMAN_ENH, SPECS.SHAMAN_RESTO },
-	[WARLOCK]						= { SPECS.WARLOCK_AFF, SPECS.WARLOCK_DEMO, SPECS.WARLOCK_DESTRO },
-	[WARRIOR]						= { SPECS.WARRIOR_ARMS, SPECS.WARRIOR_FURY, SPECS.WARRIOR_PROT }
+	[DRUID]						= { SPECS.DRUID_BALANCE, SPECS.DRUID_FERAL, SPECS.DRUID_GUARDIAN, SPECS.DRUID_RESTO },
+	[EVOKER]					= { SPECS.EVOKER_DEVA, SPECS.EVOKER_PRES, SPECS.EVOKER_AUG },
+	[HUNTER]					= { SPECS.HUNTER_BM, SPECS.HUNTER_MARKS, SPECS.HUNTER_SURVIVAL },
+	[MAGE]						= { SPECS.MAGE_ARCANE, SPECS.MAGE_FIRE, SPECS.MAGE_FROST },
+	[MONK]						= { SPECS.MONK_BM, SPECS.MONK_MW, SPECS.MONK_WW },
+	[PALADIN]					= { SPECS.PALADIN_HOLY, SPECS.PALADIN_PROT, SPECS.PALADIN_RET },
+	[PRIEST]					= { SPECS.PRIEST_DISC, SPECS.PRIEST_HOLY, SPECS.PRIEST_SHADOW },
+	[ROGUE]						= { SPECS.ROGUE_ASS, SPECS.ROGUE_OUTLAW, SPECS.ROGUE_SUB },
+	[SHAMAN]					= { SPECS.SHAMAN_ELE, SPECS.SHAMAN_ENH, SPECS.SHAMAN_RESTO },
+	[WARLOCK]					= { SPECS.WARLOCK_AFF, SPECS.WARLOCK_DEMO, SPECS.WARLOCK_DESTRO },
+	[WARRIOR]					= { SPECS.WARRIOR_ARMS, SPECS.WARRIOR_FURY, SPECS.WARRIOR_PROT }
 }
 
 -- Mapping of specs to roles
 -- Roles
-PLH_ROLE_AGILITY_DPS				= 'AGILITY_DPS'
-PLH_ROLE_INTELLECT_DPS				= 'INTELLECT_DPS'
-PLH_ROLE_STRENGTH_DPS				= 'STRENGTH_DPS'
+PLH_ROLE_AGILITY_DPS					= 'AGILITY_DPS'
+PLH_ROLE_INTELLECT_DPS					= 'INTELLECT_DPS'
+PLH_ROLE_STRENGTH_DPS					= 'STRENGTH_DPS'
 PLH_ROLE_HEALER						= 'HEALER'
 PLH_ROLE_TANK						= 'TANK'
 PLH_ROLE_UNKNOWN					= 'UNKNOWN'
@@ -134,41 +134,41 @@ local ROLE_BY_SPEC = {
 	[SPECS.DK_FROST]				= PLH_ROLE_STRENGTH_DPS,
 	[SPECS.DK_UNHOLY]				= PLH_ROLE_STRENGTH_DPS,
 	[SPECS.DH_HAVOC]				= PLH_ROLE_AGILITY_DPS,
-	[SPECS.DH_VENGEANCE]			= PLH_ROLE_TANK,
-	[SPECS.DRUID_BALANCE]			= PLH_ROLE_INTELLECT_DPS,
+	[SPECS.DH_VENGEANCE]				= PLH_ROLE_TANK,
+	[SPECS.DRUID_BALANCE]				= PLH_ROLE_INTELLECT_DPS,
 	[SPECS.DRUID_FERAL]				= PLH_ROLE_AGILITY_DPS,
-	[SPECS.DRUID_GUARDIAN]			= PLH_ROLE_TANK,
+	[SPECS.DRUID_GUARDIAN]				= PLH_ROLE_TANK,
 	[SPECS.DRUID_RESTO]				= PLH_ROLE_HEALER,
 	[SPECS.EVOKER_DEVA]				= PLH_ROLE_INTELLECT_DPS,
 	[SPECS.EVOKER_PRES]				= PLH_ROLE_HEALER,
 	[SPECS.EVOKER_AUG]				= PLH_ROLE_INTELLECT_DPS,
 	[SPECS.HUNTER_BM]				= PLH_ROLE_AGILITY_DPS,
-	[SPECS.HUNTER_MARKS]			= PLH_ROLE_AGILITY_DPS,
-	[SPECS.HUNTER_SURVIVAL]			= PLH_ROLE_AGILITY_DPS,
+	[SPECS.HUNTER_MARKS]				= PLH_ROLE_AGILITY_DPS,
+	[SPECS.HUNTER_SURVIVAL]				= PLH_ROLE_AGILITY_DPS,
 	[SPECS.MAGE_ARCANE]				= PLH_ROLE_INTELLECT_DPS,
 	[SPECS.MAGE_FIRE]				= PLH_ROLE_INTELLECT_DPS,
 	[SPECS.MAGE_FROST]				= PLH_ROLE_INTELLECT_DPS,
 	[SPECS.MONK_BM]					= PLH_ROLE_TANK,
 	[SPECS.MONK_MW]					= PLH_ROLE_HEALER,
 	[SPECS.MONK_WW]					= PLH_ROLE_AGILITY_DPS,
-	[SPECS.PALADIN_HOLY]			= PLH_ROLE_HEALER,
-	[SPECS.PALADIN_PROT]			= PLH_ROLE_TANK,
+	[SPECS.PALADIN_HOLY]				= PLH_ROLE_HEALER,
+	[SPECS.PALADIN_PROT]				= PLH_ROLE_TANK,
 	[SPECS.PALADIN_RET]				= PLH_ROLE_STRENGTH_DPS,
 	[SPECS.PRIEST_DISC]				= PLH_ROLE_HEALER,
 	[SPECS.PRIEST_HOLY]				= PLH_ROLE_HEALER,
-	[SPECS.PRIEST_SHADOW]			= PLH_ROLE_INTELLECT_DPS,
+	[SPECS.PRIEST_SHADOW]				= PLH_ROLE_INTELLECT_DPS,
 	[SPECS.ROGUE_ASS]				= PLH_ROLE_AGILITY_DPS,
-	[SPECS.ROGUE_OUTLAW]			= PLH_ROLE_AGILITY_DPS,
+	[SPECS.ROGUE_OUTLAW]				= PLH_ROLE_AGILITY_DPS,
 	[SPECS.ROGUE_SUB]				= PLH_ROLE_AGILITY_DPS,
 	[SPECS.SHAMAN_ELE]				= PLH_ROLE_INTELLECT_DPS,
 	[SPECS.SHAMAN_ENH]				= PLH_ROLE_AGILITY_DPS,
-	[SPECS.SHAMAN_RESTO]			= PLH_ROLE_HEALER,
+	[SPECS.SHAMAN_RESTO]				= PLH_ROLE_HEALER,
 	[SPECS.WARLOCK_AFF]				= PLH_ROLE_INTELLECT_DPS,
-	[SPECS.WARLOCK_DEMO]			= PLH_ROLE_INTELLECT_DPS,
-	[SPECS.WARLOCK_DESTRO]			= PLH_ROLE_INTELLECT_DPS,
-	[SPECS.WARRIOR_ARMS]			= PLH_ROLE_STRENGTH_DPS,
-	[SPECS.WARRIOR_FURY]			= PLH_ROLE_STRENGTH_DPS,
-	[SPECS.WARRIOR_PROT]			= PLH_ROLE_TANK
+	[SPECS.WARLOCK_DEMO]				= PLH_ROLE_INTELLECT_DPS,
+	[SPECS.WARLOCK_DESTRO]				= PLH_ROLE_INTELLECT_DPS,
+	[SPECS.WARRIOR_ARMS]				= PLH_ROLE_STRENGTH_DPS,
+	[SPECS.WARRIOR_FURY]				= PLH_ROLE_STRENGTH_DPS,
+	[SPECS.WARRIOR_PROT]				= PLH_ROLE_TANK
 }
 
 local PRIMARY_ATTRIBUTE_BY_SPEC = {
@@ -176,56 +176,42 @@ local PRIMARY_ATTRIBUTE_BY_SPEC = {
 	[SPECS.DK_FROST]				= ITEM_MOD_STRENGTH_SHORT,
 	[SPECS.DK_UNHOLY]				= ITEM_MOD_STRENGTH_SHORT,
 	[SPECS.DH_HAVOC]				= ITEM_MOD_AGILITY_SHORT,
-	[SPECS.DH_VENGEANCE]			= ITEM_MOD_AGILITY_SHORT,
-	[SPECS.DRUID_BALANCE]			= ITEM_MOD_INTELLECT_SHORT,
+	[SPECS.DH_VENGEANCE]				= ITEM_MOD_AGILITY_SHORT,
+	[SPECS.DRUID_BALANCE]				= ITEM_MOD_INTELLECT_SHORT,
 	[SPECS.DRUID_FERAL]				= ITEM_MOD_AGILITY_SHORT,
-	[SPECS.DRUID_GUARDIAN]			= ITEM_MOD_AGILITY_SHORT,
+	[SPECS.DRUID_GUARDIAN]				= ITEM_MOD_AGILITY_SHORT,
 	[SPECS.DRUID_RESTO]				= ITEM_MOD_INTELLECT_SHORT,
 	[SPECS.EVOKER_DEVA]				= ITEM_MOD_INTELLECT_SHORT,
 	[SPECS.EVOKER_PRES]				= ITEM_MOD_INTELLECT_SHORT,
 	[SPECS.EVOKER_AUG]				= ITEM_MOD_INTELLECT_SHORT,
 	[SPECS.HUNTER_BM]				= ITEM_MOD_AGILITY_SHORT,
-	[SPECS.HUNTER_MARKS]			= ITEM_MOD_AGILITY_SHORT,
-	[SPECS.HUNTER_SURVIVAL]			= ITEM_MOD_AGILITY_SHORT,
+	[SPECS.HUNTER_MARKS]				= ITEM_MOD_AGILITY_SHORT,
+	[SPECS.HUNTER_SURVIVAL]				= ITEM_MOD_AGILITY_SHORT,
 	[SPECS.MAGE_ARCANE]				= ITEM_MOD_INTELLECT_SHORT,
 	[SPECS.MAGE_FIRE]				= ITEM_MOD_INTELLECT_SHORT,
 	[SPECS.MAGE_FROST]				= ITEM_MOD_INTELLECT_SHORT,
 	[SPECS.MONK_BM]					= ITEM_MOD_AGILITY_SHORT,
 	[SPECS.MONK_MW]					= ITEM_MOD_INTELLECT_SHORT,
 	[SPECS.MONK_WW]					= ITEM_MOD_AGILITY_SHORT,
-	[SPECS.PALADIN_HOLY]			= ITEM_MOD_INTELLECT_SHORT,
-	[SPECS.PALADIN_PROT]			= ITEM_MOD_STRENGTH_SHORT,
+	[SPECS.PALADIN_HOLY]				= ITEM_MOD_INTELLECT_SHORT,
+	[SPECS.PALADIN_PROT]				= ITEM_MOD_STRENGTH_SHORT,
 	[SPECS.PALADIN_RET]				= ITEM_MOD_STRENGTH_SHORT,
 	[SPECS.PRIEST_DISC]				= ITEM_MOD_INTELLECT_SHORT,
 	[SPECS.PRIEST_HOLY]				= ITEM_MOD_INTELLECT_SHORT,
-	[SPECS.PRIEST_SHADOW]			= ITEM_MOD_INTELLECT_SHORT,
+	[SPECS.PRIEST_SHADOW]				= ITEM_MOD_INTELLECT_SHORT,
 	[SPECS.ROGUE_ASS]				= ITEM_MOD_AGILITY_SHORT,
-	[SPECS.ROGUE_OUTLAW]			= ITEM_MOD_AGILITY_SHORT,
+	[SPECS.ROGUE_OUTLAW]				= ITEM_MOD_AGILITY_SHORT,
 	[SPECS.ROGUE_SUB]				= ITEM_MOD_AGILITY_SHORT,
 	[SPECS.SHAMAN_ELE]				= ITEM_MOD_INTELLECT_SHORT,
 	[SPECS.SHAMAN_ENH]				= ITEM_MOD_AGILITY_SHORT,
-	[SPECS.SHAMAN_RESTO]			= ITEM_MOD_INTELLECT_SHORT,
+	[SPECS.SHAMAN_RESTO]				= ITEM_MOD_INTELLECT_SHORT,
 	[SPECS.WARLOCK_AFF]				= ITEM_MOD_INTELLECT_SHORT,
-	[SPECS.WARLOCK_DEMO]			= ITEM_MOD_INTELLECT_SHORT,
-	[SPECS.WARLOCK_DESTRO]			= ITEM_MOD_INTELLECT_SHORT,
-	[SPECS.WARRIOR_ARMS]			= ITEM_MOD_STRENGTH_SHORT,
-	[SPECS.WARRIOR_FURY]			= ITEM_MOD_STRENGTH_SHORT,
-	[SPECS.WARRIOR_PROT]			= ITEM_MOD_STRENGTH_SHORT
+	[SPECS.WARLOCK_DEMO]				= ITEM_MOD_INTELLECT_SHORT,
+	[SPECS.WARLOCK_DESTRO]				= ITEM_MOD_INTELLECT_SHORT,
+	[SPECS.WARRIOR_ARMS]				= ITEM_MOD_STRENGTH_SHORT,
+	[SPECS.WARRIOR_FURY]				= ITEM_MOD_STRENGTH_SHORT,
+	[SPECS.WARRIOR_PROT]				= ITEM_MOD_STRENGTH_SHORT
 }
-
-function PrintTable(tbl, indent)
-    indent = indent or 0
-    local indentStr = string.rep(" ", indent)
-
-    for k, v in pairs(tbl) do
-        if type(v) == "table" then
-            print(indentStr .. tostring(k) .. ":")
-            PrintTable(v, indent + 4)
-        else
-            print(indentStr .. tostring(k) .. ": " .. tostring(v))
-        end
-    end
-end
 
 local ItemClass = Enum.ItemClass
 local ItemArmorSubclass = Enum.ItemArmorSubclass
@@ -237,41 +223,41 @@ local EQUIPPABLE_ARMOR_BY_SPEC = {
 	[SPECS.DK_FROST]				= { ItemArmorSubclass.Plate },
 	[SPECS.DK_UNHOLY]				= { ItemArmorSubclass.Plate },
 	[SPECS.DH_HAVOC]				= { ItemArmorSubclass.Leather },
-	[SPECS.DH_VENGEANCE]			= { ItemArmorSubclass.Leather },
-	[SPECS.DRUID_BALANCE]			= { ItemArmorSubclass.Leather, ItemArmorSubclass.Generic },
+	[SPECS.DH_VENGEANCE]				= { ItemArmorSubclass.Leather },
+	[SPECS.DRUID_BALANCE]				= { ItemArmorSubclass.Leather, ItemArmorSubclass.Generic },
 	[SPECS.DRUID_FERAL]				= { ItemArmorSubclass.Leather },
-	[SPECS.DRUID_GUARDIAN]			= { ItemArmorSubclass.Leather },
+	[SPECS.DRUID_GUARDIAN]				= { ItemArmorSubclass.Leather },
 	[SPECS.DRUID_RESTO]				= { ItemArmorSubclass.Leather, ItemArmorSubclass.Generic },
 	[SPECS.EVOKER_DEVA]				= { ItemArmorSubclass.Mail, ItemArmorSubclass.Generic },
 	[SPECS.EVOKER_PRES]				= { ItemArmorSubclass.Mail, ItemArmorSubclass.Generic },
 	[SPECS.EVOKER_AUG]				= { ItemArmorSubclass.Mail, ItemArmorSubclass.Generic },
 	[SPECS.HUNTER_BM]				= { ItemArmorSubclass.Mail },
-	[SPECS.HUNTER_MARKS]			= { ItemArmorSubclass.Mail },
-	[SPECS.HUNTER_SURVIVAL]			= { ItemArmorSubclass.Mail },
+	[SPECS.HUNTER_MARKS]				= { ItemArmorSubclass.Mail },
+	[SPECS.HUNTER_SURVIVAL]				= { ItemArmorSubclass.Mail },
 	[SPECS.MAGE_ARCANE]				= { ItemArmorSubclass.Cloth, ItemArmorSubclass.Generic },
 	[SPECS.MAGE_FIRE]				= { ItemArmorSubclass.Cloth, ItemArmorSubclass.Generic },
 	[SPECS.MAGE_FROST]				= { ItemArmorSubclass.Cloth, ItemArmorSubclass.Generic },
 	[SPECS.MONK_BM]					= { ItemArmorSubclass.Leather },
 	[SPECS.MONK_MW]					= { ItemArmorSubclass.Leather, ItemArmorSubclass.Generic },
 	[SPECS.MONK_WW]					= { ItemArmorSubclass.Leather },
-	[SPECS.PALADIN_HOLY]			= { ItemArmorSubclass.Plate, ItemArmorSubclass.Generic, ItemArmorSubclass.Shield },
-	[SPECS.PALADIN_PROT]			= { ItemArmorSubclass.Plate, ItemArmorSubclass.Shield },
+	[SPECS.PALADIN_HOLY]				= { ItemArmorSubclass.Plate, ItemArmorSubclass.Generic, ItemArmorSubclass.Shield },
+	[SPECS.PALADIN_PROT]				= { ItemArmorSubclass.Plate, ItemArmorSubclass.Shield },
 	[SPECS.PALADIN_RET]				= { ItemArmorSubclass.Plate },
 	[SPECS.PRIEST_DISC]				= { ItemArmorSubclass.Cloth, ItemArmorSubclass.Generic },
 	[SPECS.PRIEST_HOLY]				= { ItemArmorSubclass.Cloth, ItemArmorSubclass.Generic },
-	[SPECS.PRIEST_SHADOW]			= { ItemArmorSubclass.Cloth, ItemArmorSubclass.Generic },
+	[SPECS.PRIEST_SHADOW]				= { ItemArmorSubclass.Cloth, ItemArmorSubclass.Generic },
 	[SPECS.ROGUE_ASS]				= { ItemArmorSubclass.Leather },
-	[SPECS.ROGUE_OUTLAW]			= { ItemArmorSubclass.Leather },
+	[SPECS.ROGUE_OUTLAW]				= { ItemArmorSubclass.Leather },
 	[SPECS.ROGUE_SUB]				= { ItemArmorSubclass.Leather },
 	[SPECS.SHAMAN_ELE]				= { ItemArmorSubclass.Mail, ItemArmorSubclass.Generic, ItemArmorSubclass.Shield },
 	[SPECS.SHAMAN_ENH]				= { ItemArmorSubclass.Mail },
-	[SPECS.SHAMAN_RESTO]			= { ItemArmorSubclass.Mail, ItemArmorSubclass.Generic, ItemArmorSubclass.Shield },
+	[SPECS.SHAMAN_RESTO]				= { ItemArmorSubclass.Mail, ItemArmorSubclass.Generic, ItemArmorSubclass.Shield },
 	[SPECS.WARLOCK_AFF]				= { ItemArmorSubclass.Cloth, ItemArmorSubclass.Generic },
-	[SPECS.WARLOCK_DEMO]			= { ItemArmorSubclass.Cloth, ItemArmorSubclass.Generic },
-	[SPECS.WARLOCK_DESTRO]			= { ItemArmorSubclass.Cloth, ItemArmorSubclass.Generic },
-	[SPECS.WARRIOR_ARMS]			= { ItemArmorSubclass.Plate },
-	[SPECS.WARRIOR_FURY]			= { ItemArmorSubclass.Plate },
-	[SPECS.WARRIOR_PROT]			= { ItemArmorSubclass.Plate, ItemArmorSubclass.Shield }
+	[SPECS.WARLOCK_DEMO]				= { ItemArmorSubclass.Cloth, ItemArmorSubclass.Generic },
+	[SPECS.WARLOCK_DESTRO]				= { ItemArmorSubclass.Cloth, ItemArmorSubclass.Generic },
+	[SPECS.WARRIOR_ARMS]				= { ItemArmorSubclass.Plate },
+	[SPECS.WARRIOR_FURY]				= { ItemArmorSubclass.Plate },
+	[SPECS.WARRIOR_PROT]				= { ItemArmorSubclass.Plate, ItemArmorSubclass.Shield }
 }
 
 local EQUIPPABLE_WEAPON_BY_SPEC = {
@@ -279,54 +265,54 @@ local EQUIPPABLE_WEAPON_BY_SPEC = {
 	[SPECS.DK_FROST]				= { ItemWeaponSubclass.Axe1H, ItemWeaponSubclass.Mace1H, ItemWeaponSubclass.Sword1H },
 	[SPECS.DK_UNHOLY]				= { ItemWeaponSubclass.Axe2H, ItemWeaponSubclass.Mace2H, ItemWeaponSubclass.Polearm, ItemWeaponSubclass.Sword2H },
 	[SPECS.DH_HAVOC]				= { ItemWeaponSubclass.Axe1H, ItemWeaponSubclass.Sword1H, ItemWeaponSubclass.Unarmed, ItemWeaponSubclass.Warglaive },
-	[SPECS.DH_VENGEANCE]			= { ItemWeaponSubclass.Axe1H, ItemWeaponSubclass.Sword1H, ItemWeaponSubclass.Unarmed, ItemWeaponSubclass.Warglaive },
-	[SPECS.DRUID_BALANCE]			= { ItemWeaponSubclass.Dagger, ItemWeaponSubclass.Mace1H, ItemWeaponSubclass.Mace2H, ItemWeaponSubclass.Polearm, ItemWeaponSubclass.Staff, ItemWeaponSubclass.Unarmed },
+	[SPECS.DH_VENGEANCE]				= { ItemWeaponSubclass.Axe1H, ItemWeaponSubclass.Sword1H, ItemWeaponSubclass.Unarmed, ItemWeaponSubclass.Warglaive },
+	[SPECS.DRUID_BALANCE]				= { ItemWeaponSubclass.Dagger, ItemWeaponSubclass.Mace1H, ItemWeaponSubclass.Mace2H, ItemWeaponSubclass.Polearm, ItemWeaponSubclass.Staff, ItemWeaponSubclass.Unarmed },
 	[SPECS.DRUID_FERAL]				= { ItemWeaponSubclass.Mace2H, ItemWeaponSubclass.Polearm, ItemWeaponSubclass.Staff },
-	[SPECS.DRUID_GUARDIAN]			= { ItemWeaponSubclass.Mace2H, ItemWeaponSubclass.Polearm, ItemWeaponSubclass.Staff },
+	[SPECS.DRUID_GUARDIAN]				= { ItemWeaponSubclass.Mace2H, ItemWeaponSubclass.Polearm, ItemWeaponSubclass.Staff },
 	[SPECS.DRUID_RESTO]				= { ItemWeaponSubclass.Dagger, ItemWeaponSubclass.Mace1H, ItemWeaponSubclass.Mace2H, ItemWeaponSubclass.Polearm, ItemWeaponSubclass.Staff, ItemWeaponSubclass.Unarmed },
 	[SPECS.EVOKER_DEVA]				= { ItemWeaponSubclass.Dagger, ItemWeaponSubclass.Axe1H, ItemWeaponSubclass.Axe2H, ItemWeaponSubclass.Mace1H, ItemWeaponSubclass.Mace2H, ItemWeaponSubclass.Staff, ItemWeaponSubclass.Sword1H, ItemWeaponSubclass.Sword2H, ItemWeaponSubclass.Unarmed },
 	[SPECS.EVOKER_PRES]				= { ItemWeaponSubclass.Dagger, ItemWeaponSubclass.Axe1H, ItemWeaponSubclass.Axe2H, ItemWeaponSubclass.Mace1H, ItemWeaponSubclass.Mace2H, ItemWeaponSubclass.Staff, ItemWeaponSubclass.Sword1H, ItemWeaponSubclass.Sword2H, ItemWeaponSubclass.Unarmed },
 	[SPECS.EVOKER_AUG]				= { ItemWeaponSubclass.Dagger, ItemWeaponSubclass.Axe1H, ItemWeaponSubclass.Axe2H, ItemWeaponSubclass.Mace1H, ItemWeaponSubclass.Mace2H, ItemWeaponSubclass.Staff, ItemWeaponSubclass.Sword1H, ItemWeaponSubclass.Sword2H, ItemWeaponSubclass.Unarmed },
 	[SPECS.HUNTER_BM]				= { ItemWeaponSubclass.Bows, ItemWeaponSubclass.Crossbow, ItemWeaponSubclass.Guns },
-	[SPECS.HUNTER_MARKS]			= { ItemWeaponSubclass.Bows, ItemWeaponSubclass.Crossbow, ItemWeaponSubclass.Guns },
-	[SPECS.HUNTER_SURVIVAL]			= { ItemWeaponSubclass.Polearm, ItemWeaponSubclass.Staff },
+	[SPECS.HUNTER_MARKS]				= { ItemWeaponSubclass.Bows, ItemWeaponSubclass.Crossbow, ItemWeaponSubclass.Guns },
+	[SPECS.HUNTER_SURVIVAL]				= { ItemWeaponSubclass.Polearm, ItemWeaponSubclass.Staff },
 	[SPECS.MAGE_ARCANE]				= { ItemWeaponSubclass.Dagger, ItemWeaponSubclass.Staff, ItemWeaponSubclass.Sword1H, ItemWeaponSubclass.Wand },
 	[SPECS.MAGE_FIRE]				= { ItemWeaponSubclass.Dagger, ItemWeaponSubclass.Staff, ItemWeaponSubclass.Sword1H, ItemWeaponSubclass.Wand },
 	[SPECS.MAGE_FROST]				= { ItemWeaponSubclass.Dagger, ItemWeaponSubclass.Staff, ItemWeaponSubclass.Sword1H, ItemWeaponSubclass.Wand },
 	[SPECS.MONK_BM]					= { ItemWeaponSubclass.Polearm, ItemWeaponSubclass.Staff },
 	[SPECS.MONK_MW]					= { ItemWeaponSubclass.Axe1H, ItemWeaponSubclass.Mace1H, ItemWeaponSubclass.Polearm, ItemWeaponSubclass.Staff, ItemWeaponSubclass.Sword1H, ItemWeaponSubclass.Unarmed },
 	[SPECS.MONK_WW]					= { ItemWeaponSubclass.Axe1H, ItemWeaponSubclass.Mace1H, ItemWeaponSubclass.Sword1H, ItemWeaponSubclass.Unarmed },
-	[SPECS.PALADIN_HOLY]			= { ItemWeaponSubclass.Axe1H, ItemWeaponSubclass.Mace1H, ItemWeaponSubclass.Mace2H, ItemWeaponSubclass.Polearm, ItemWeaponSubclass.Sword1H, ItemWeaponSubclass.Sword2H },
-	[SPECS.PALADIN_PROT]			= { ItemWeaponSubclass.Axe1H, ItemWeaponSubclass.Mace1H, ItemWeaponSubclass.Sword1H },
+	[SPECS.PALADIN_HOLY]				= { ItemWeaponSubclass.Axe1H, ItemWeaponSubclass.Mace1H, ItemWeaponSubclass.Mace2H, ItemWeaponSubclass.Polearm, ItemWeaponSubclass.Sword1H, ItemWeaponSubclass.Sword2H },
+	[SPECS.PALADIN_PROT]				= { ItemWeaponSubclass.Axe1H, ItemWeaponSubclass.Mace1H, ItemWeaponSubclass.Sword1H },
 	[SPECS.PALADIN_RET]				= { ItemWeaponSubclass.Axe2H, ItemWeaponSubclass.Mace2H, ItemWeaponSubclass.Polearm, ItemWeaponSubclass.Sword2H },
 	[SPECS.PRIEST_DISC]				= { ItemWeaponSubclass.Dagger, ItemWeaponSubclass.Mace1H, ItemWeaponSubclass.Staff, ItemWeaponSubclass.Wand },
 	[SPECS.PRIEST_HOLY]				= { ItemWeaponSubclass.Dagger, ItemWeaponSubclass.Mace1H, ItemWeaponSubclass.Staff, ItemWeaponSubclass.Wand },
-	[SPECS.PRIEST_SHADOW]			= { ItemWeaponSubclass.Dagger, ItemWeaponSubclass.Mace1H, ItemWeaponSubclass.Staff, ItemWeaponSubclass.Wand },
+	[SPECS.PRIEST_SHADOW]				= { ItemWeaponSubclass.Dagger, ItemWeaponSubclass.Mace1H, ItemWeaponSubclass.Staff, ItemWeaponSubclass.Wand },
 	[SPECS.ROGUE_ASS]				= { ItemWeaponSubclass.Dagger },
-	[SPECS.ROGUE_OUTLAW]			= { ItemWeaponSubclass.Axe1H, ItemWeaponSubclass.Mace1H, ItemWeaponSubclass.Sword1H, ItemWeaponSubclass.Unarmed },
+	[SPECS.ROGUE_OUTLAW]				= { ItemWeaponSubclass.Axe1H, ItemWeaponSubclass.Mace1H, ItemWeaponSubclass.Sword1H, ItemWeaponSubclass.Unarmed },
 	[SPECS.ROGUE_SUB]				= { ItemWeaponSubclass.Dagger },
 	[SPECS.SHAMAN_ELE]				= { ItemWeaponSubclass.Dagger, ItemWeaponSubclass.Axe1H, ItemWeaponSubclass.Mace1H, ItemWeaponSubclass.Mace2H, ItemWeaponSubclass.Staff, ItemWeaponSubclass.Unarmed },
 	[SPECS.SHAMAN_ENH]				= { ItemWeaponSubclass.Axe1H, ItemWeaponSubclass.Mace1H, ItemWeaponSubclass.Unarmed },
-	[SPECS.SHAMAN_RESTO]			= { ItemWeaponSubclass.Dagger, ItemWeaponSubclass.Axe1H, ItemWeaponSubclass.Mace1H, ItemWeaponSubclass.Mace2H, ItemWeaponSubclass.Staff, ItemWeaponSubclass.Unarmed },
+	[SPECS.SHAMAN_RESTO]				= { ItemWeaponSubclass.Dagger, ItemWeaponSubclass.Axe1H, ItemWeaponSubclass.Mace1H, ItemWeaponSubclass.Mace2H, ItemWeaponSubclass.Staff, ItemWeaponSubclass.Unarmed },
 	[SPECS.WARLOCK_AFF]				= { ItemWeaponSubclass.Dagger, ItemWeaponSubclass.Staff, ItemWeaponSubclass.Sword1H, ItemWeaponSubclass.Wand },
-	[SPECS.WARLOCK_DEMO]			= { ItemWeaponSubclass.Dagger, ItemWeaponSubclass.Staff, ItemWeaponSubclass.Sword1H, ItemWeaponSubclass.Wand },
-	[SPECS.WARLOCK_DESTRO]			= { ItemWeaponSubclass.Dagger, ItemWeaponSubclass.Staff, ItemWeaponSubclass.Sword1H, ItemWeaponSubclass.Wand },
-	[SPECS.WARRIOR_ARMS]			= { ItemWeaponSubclass.Axe2H, ItemWeaponSubclass.Mace2H, ItemWeaponSubclass.Polearm, ItemWeaponSubclass.Sword2H },
-	[SPECS.WARRIOR_FURY]			= { ItemWeaponSubclass.Axe2H, ItemWeaponSubclass.Mace2H, ItemWeaponSubclass.Polearm, ItemWeaponSubclass.Sword2H },
-	[SPECS.WARRIOR_PROT]			= { ItemWeaponSubclass.Axe1H, ItemWeaponSubclass.Mace1H, ItemWeaponSubclass.Sword1H }
+	[SPECS.WARLOCK_DEMO]				= { ItemWeaponSubclass.Dagger, ItemWeaponSubclass.Staff, ItemWeaponSubclass.Sword1H, ItemWeaponSubclass.Wand },
+	[SPECS.WARLOCK_DESTRO]				= { ItemWeaponSubclass.Dagger, ItemWeaponSubclass.Staff, ItemWeaponSubclass.Sword1H, ItemWeaponSubclass.Wand },
+	[SPECS.WARRIOR_ARMS]				= { ItemWeaponSubclass.Axe2H, ItemWeaponSubclass.Mace2H, ItemWeaponSubclass.Polearm, ItemWeaponSubclass.Sword2H },
+	[SPECS.WARRIOR_FURY]				= { ItemWeaponSubclass.Axe2H, ItemWeaponSubclass.Mace2H, ItemWeaponSubclass.Polearm, ItemWeaponSubclass.Sword2H },
+	[SPECS.WARRIOR_PROT]				= { ItemWeaponSubclass.Axe1H, ItemWeaponSubclass.Mace1H, ItemWeaponSubclass.Sword1H }
 }
 
 local SPECS_EXPECTED_TO_HAVE_OFFHAND = {
 	[SPECS.DK_FROST] 				= true,
-	[SPECS.DH_VENGEANCE]			= true,
+	[SPECS.DH_VENGEANCE]				= true,
 	[SPECS.DH_HAVOC] 				= true,
 	[SPECS.MONK_WW] 				= true,
-	[SPECS.PALADIN_PROT] 			= true,
+	[SPECS.PALADIN_PROT] 				= true,
 	[SPECS.ROGUE_ASS] 				= true,
-	[SPECS.ROGUE_OUTLAW] 			= true,
+	[SPECS.ROGUE_OUTLAW] 				= true,
 	[SPECS.ROGUE_SUB] 				= true,
 	[SPECS.SHAMAN_ENH] 				= true,
-	[SPECS.WARRIOR_PROT] 			= true
+	[SPECS.WARRIOR_PROT] 				= true
 }
 
 local XMOG_BY_CLASS = {
@@ -393,7 +379,7 @@ local lootListening = false
 
      -----------------------------------------------------------------------
      ------------------ FONCTION USEFULL FOR THE EVENT ---------------------
-	 -----------------------------------------------------------------------
+     -----------------------------------------------------------------------
 
   --Fonction pour chercher l'info dans le tooltip créé artificiellement
   local function GetILVLFromTooltip(tooltip)
@@ -797,12 +783,25 @@ end
 ---------------------------------------
 -- Fonction de debug pour simuler le loot d'un item
 
+function PrintTable(tbl, indent)
+    indent = indent or 0
+    local indentStr = string.rep(" ", indent)
+
+    for k, v in pairs(tbl) do
+        if type(v) == "table" then
+            print(indentStr .. tostring(k) .. ":")
+            PrintTable(v, indent + 4)
+        else
+            print(indentStr .. tostring(k) .. ": " .. tostring(v))
+        end
+    end
+end
+
 local Booleendebug = false
 if Booleendebug then
-
-local function SimulateNewItemAddition()
-    local playerName = "JohnDoe"  -- Nom du joueur (simulé)
-    local itemLink = "|cffa335ee|Hitem:12345:::::::::::::|h[Item Name]|h|r"  -- Lien de l'item (simulé)
+  local function SimulateNewItemAddition()
+  local playerName = "JohnDoe"  -- Nom du joueur (simulé)
+  local itemLink = "|cffa335ee|Hitem:12345:::::::::::::|h[Item Name]|h|r"  -- Lien de l'item (simulé)
     local realItemLevel = 200  -- Niveau réel de l'item (simulé)
     local reason = "Raid drop"  -- Raison de l'ajout de l'item (simulé)
     local hasSocket = true  -- Exemple: l'item a un socket (simulé)
@@ -1120,9 +1119,11 @@ EventManager:On("ENCOUNTER_LOOT_RECEIVED", function(encounterID, itemID, itemLin
     print('ERROR: there are no valid names.')
   end
 end)
---------------------------------------------------------------
---------- Function and Event for Group loot Roll -------------
---------------------------------------------------------------
+
+--------------------------------------------------------------------------------
+--------------------------- GROUP LOOT ROLL ------------------------------------
+--------------------------------------------------------------------------------
+
 
 -- On évite de checker chaque message. Donc on commence à appliquer la logique après que cette évènement survient
 EventManager:On("LOOT_HISTORY_UPDATE_DROP", function()
