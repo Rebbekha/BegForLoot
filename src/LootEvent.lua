@@ -386,17 +386,10 @@ local XMOG_BY_CLASS = {
 
 }
 
-local MOUNT_SUBTYPE = 15
-local PET_SUBTYPE = 17
-local TOY_SUBTYPE = 3
-local RECIPE_SUBTYPE = 9
-
 ObjectList = ObjectList or {}
 local receivedItems = {}
 
 local lootListening = false
-
-debugLootEvent = false
 
      -----------------------------------------------------------------------
      ------------------ FONCTION USEFULL FOR THE EVENT ---------------------
@@ -438,10 +431,16 @@ local function GetFullItemInfo(item)
     -- Récupération des informations de base
     _, _, fullItemInfo[FII_QUALITY], fullItemInfo[FII_BASE_ILVL], fullItemInfo[FII_REQUIRED_LEVEL], fullItemInfo[FII_TYPE], fullItemInfo[FII_SUB_TYPE], _, fullItemInfo[FII_ITEM_EQUIP_LOC], _, _, fullItemInfo[FII_CLASS], fullItemInfo[FII_SUB_CLASS], fullItemInfo[FII_BIND_TYPE], _, _, _ = GetItemInfo(item)
   
-  -- Cas particuliers des Montures/Mascottes/Jouets/Recettes
-  local itemSubType = fullItemInfo[FII_SUB_TYPE]
-  if itemSubType == MOUNT_SUBTYPE or itemSubType == PET_SUBTYPE or itemSubType == TOY_SUBTYPE or itemSubType == RECIPE_SUBTYPE then
-    return fullItemInfo -- Retourner ici car aucune autre information n'est nécessaire pour ces sous-types
+  -- Special cases for Mounts/Pets/Toys/Recipes
+  local itemClass = fullItemInfo[FII_CLASS]
+  local itemSubClass = fullItemInfo[FII_SUB_CLASS]
+
+  -- Check for mounts, pets, toys, and recipes using classID and subclassID
+  if (itemClass == 15 and itemSubClass == 5) or         -- Mount
+    (itemClass == 17 and itemSubClass == 2) or         -- Pet
+    (itemClass == 9) or                                -- Recipe
+    (C_ToyBox.IsToyUsable(item)) then                  -- Toy (using ToyBox API for toys)
+    return fullItemInfo -- Return here as no further information is needed for these subtypes
   end
 
   -- Détection si l'objet est équipable
@@ -900,11 +899,11 @@ end
 -- Set up an event listener for when the player enters the world : usefull if the player have a low config
 EventManager:On(E.SavedVariablesReady, function()
   playerReady = true
-
+  
 end)
 
 EventManager:On("ENCOUNTER_LOOT_RECEIVED", function(encounterID, itemID, itemLink, quantity, playerName, classFileName)
-
+  
   -- Check if the player is fully loaded : uselful for player with low config
   if not playerReady then
     return -- Exit if the player is not fully loaded
@@ -916,7 +915,10 @@ EventManager:On("ENCOUNTER_LOOT_RECEIVED", function(encounterID, itemID, itemLin
   
   
   --Check if the item have an ilvl and is tradeable
-  if fullItemInfo == nil then return print("fulliteminfo is nil") end 
+  if fullItemInfo == nil then 
+    --print("fulliteminfo is nil")
+    return  
+  end 
 
     -- If the item is not tradeable, exit
   if not IsTradeable(fullItemInfo)then 
@@ -924,11 +926,15 @@ EventManager:On("ENCOUNTER_LOOT_RECEIVED", function(encounterID, itemID, itemLin
   return
   end
 
-  -- Check if the item is equippable and tradeable and not in particuliar option
-  local itemSubType = fullItemInfo[FII_SUB_TYPE]
-  local CasParticulier = itemSubType == MOUNT_SUBTYPE or itemSubType == PET_SUBTYPE or itemSubType == TOY_SUBTYPE or itemSubType == RECIPE_SUBTYPE
-  if CasParticulier then
-  else
+  -- Special cases for Mounts/Pets/Toys/Recipes
+  local itemClass = fullItemInfo[FII_CLASS]
+  local itemSubClass = fullItemInfo[FII_SUB_CLASS]
+
+  -- Check the ilvl if it's not a mounts, pets, toys, and recipes 
+  if not ( (itemClass == 15 and itemSubClass == 5) or    -- Mount
+         (itemClass == 17 and itemSubClass == 2) or    -- Pet
+         (itemClass == 9) or                           -- Recipe
+         (C_ToyBox.IsToyUsable(item)) ) then           -- Toy (using ToyBox API for toys)
     if fullItemInfo[FII_REAL_ILVL] == nil then
     --print("pas d'ilvl non equipable")
       return
@@ -954,42 +960,42 @@ EventManager:On("ENCOUNTER_LOOT_RECEIVED", function(encounterID, itemID, itemLin
     local optionPet = SavedVariables:Get().optionPet
     local optionRecipe = SavedVariables:Get().optionRecipe
     local optionToy = SavedVariables:Get().optionToy
-	
-    --Option Pet
-    if optionPet and itemSubType == PET_SUBTYPE then
-	  local speciesID = C_PetJournal.FindPetIDByID(itemID)
+
+    -- Option Pet
+    if optionPet and itemClass == 17 and itemSubClass == 2 then
+      local speciesID = C_PetJournal.FindPetIDByID(itemID)
       local numCollected = speciesID and C_PetJournal.GetNumCollectedInfo(speciesID) or 0
       if numCollected == 0 then
         AddObjectlist(fullItemInfo, playerName, 'Pet')
         return
       end
     end
-	
-    --Option Mount
-    --Add the mount only if you don't have it
-    if optionMount and itemSubType == MOUNT_SUBTYPE then
-	  local mountID = C_MountJournal.GetMountFromItem(itemID)
+
+    -- Option Mount
+    -- Add the mount only if you don't have it
+    if optionMount and itemClass == 15 and itemSubClass == 5 then
+      local mountID = C_MountJournal.GetMountFromItem(itemID)
       if mountID and not select(11, C_MountJournal.GetMountInfoByID(mountID)) then
         AddObjectlist(fullItemInfo, playerName, 'Mount')
         return
       end
-    end	
-	
-    --Option Toy
-    --Add the toy only if you don't have it
-    if optionToy and itemSubType == TOY_SUBTYPE then
-	  if not PlayerHasToy(itemID) then
+    end  
+
+    -- Option Toy
+    -- Add the toy only if you don't have it
+    if optionToy and C_ToyBox.IsToyUsable(itemID) then
+      if not PlayerHasToy(itemID) then
         AddObjectlist(fullItemInfo, playerName, 'Toy')
         return
       end
     end
-	
-    --Option Recipe
-    --Add the all recipe. No filter applicate yet
-    if optionRecipe and itemSubType == RECIPE_SUBTYPE then
-	  AddObjectlist(fullItemInfo, playerName, 'Recipe')
-    end	
 
+    -- Option Recipe
+    -- Add the recipe regardless (no filter applied yet)
+    if optionRecipe and itemClass == 9 then
+      AddObjectlist(fullItemInfo, playerName, 'Recipe')
+      return
+    end  
 	
 	--Option Ilvl Upgrade
     if ilvlUpgrade then
@@ -1146,19 +1152,22 @@ EventManager:On("CHAT_MSG_LOOT", function(message, playerName, ...)
     return -- Exit if the player is not fully loaded
   end
 
+  -- Check if the option is activated
   local GroupLoot = SavedVariables:Get().GroupLoot
   if not GroupLoot then
     return -- Exit we don't want to whisper the winner of the group loot
   end
-		
-if playerName == nil or  playerName == "" then
-return
---print("playerName == nil")
-else
-     -- Extract the item link
-	-- print("playerName != nil")
-      local itemLink = message:match("|c%x+|H(.+)|h%[(.+)%]|h|r$") -- Extracts the item link
-end		
+
+  --The message we are looking has the  playerName
+  if playerName == nil or  playerName == "" then
+    return
+    --print("playerName == nil")
+  else
+    -- Extract the item link
+	--print("playerName != nil")
+    local itemLink = message:match("|c%x+|H(.+)|h%[(.+)%]|h|r$") -- Extracts the item link
+  end		
+
  -- Get full item information using the GetFullItemInfo function
   local fullItemInfo = GetFullItemInfo(itemLink)
   
@@ -1166,22 +1175,26 @@ end
   --Check if the item have an ilvl and is tradeable
   if fullItemInfo == nil then 
     --print("fulliteminfo is nil") 
-    return 
+    return
   end 
 
-    -- If the item is not tradeable, exit
+  -- If the item is not tradeable, exit
   if not IsTradeable(fullItemInfo)then 
-  print("Item not Tradeable")  
-  return
+    --print("Item not Tradeable")  
+    return
   end
 
-  -- Check if the item is equippable and tradeable and not in particuliar option
-  local itemSubType = fullItemInfo[FII_SUB_TYPE]
-  local CasParticulier = itemSubType == MOUNT_SUBTYPE or itemSubType == PET_SUBTYPE or itemSubType == TOY_SUBTYPE or itemSubType == RECIPE_SUBTYPE
-  if CasParticulier then
-  else
+  -- Special cases for Mounts/Pets/Toys/Recipes
+  local itemClass = fullItemInfo[FII_CLASS]
+  local itemSubClass = fullItemInfo[FII_SUB_CLASS]
+
+  -- Check the ilvl if it's not a mounts, pets, toys, and recipes 
+  if not ( (itemClass == 15 and itemSubClass == 5) or    -- Mount
+         (itemClass == 17 and itemSubClass == 2) or    -- Pet
+         (itemClass == 9) or                           -- Recipe
+         (C_ToyBox.IsToyUsable(item)) ) then           -- Toy (using ToyBox API for toys)
     if fullItemInfo[FII_REAL_ILVL] == nil then
-      print("pas d'ilvl non equipable")
+    --print("pas d'ilvl non equipable")
       return
     end
   end
@@ -1190,7 +1203,7 @@ end
   local myName = UnitName("player") -- Get the name of the current player
   local _, myClass = UnitClass('player')
   
-  --print(playerName)
+  
   -- The loot is from other
   if playerName ~= myName then
     -- Retrieve user-selected options from saved variables
@@ -1206,41 +1219,43 @@ end
     local optionPet = SavedVariables:Get().optionPet
     local optionRecipe = SavedVariables:Get().optionRecipe
     local optionToy = SavedVariables:Get().optionToy
-	
-    --Option Pet
-    if optionPet and itemSubType == PET_SUBTYPE then
-	  local speciesID = C_PetJournal.FindPetIDByID(itemID)
+
+
+    -- Option Pet
+    if optionPet and itemClass == 17 and itemSubClass == 2 then
+      local speciesID = C_PetJournal.FindPetIDByID(itemID)
       local numCollected = speciesID and C_PetJournal.GetNumCollectedInfo(speciesID) or 0
       if numCollected == 0 then
         AddObjectlist(fullItemInfo, playerName, 'Pet')
         return
       end
     end
-	
-    --Option Mount
-    --Add the mount only if you don't have it
-    if optionMount and itemSubType == MOUNT_SUBTYPE then
-	  local mountID = C_MountJournal.GetMountFromItem(itemID)
+
+    -- Option Mount
+    -- Add the mount only if you don't have it
+    if optionMount and itemClass == 15 and itemSubClass == 5 then
+      local mountID = C_MountJournal.GetMountFromItem(itemID)
       if mountID and not select(11, C_MountJournal.GetMountInfoByID(mountID)) then
         AddObjectlist(fullItemInfo, playerName, 'Mount')
         return
       end
-    end	
-	
-    --Option Toy
-    --Add the toy only if you don't have it
-    if optionToy and itemSubType == TOY_SUBTYPE then
-	  if not PlayerHasToy(itemID) then
+    end  
+
+    -- Option Toy
+    -- Add the toy only if you don't have it
+    if optionToy and C_ToyBox.IsToyUsable(itemID) then
+      if not PlayerHasToy(itemID) then
         AddObjectlist(fullItemInfo, playerName, 'Toy')
         return
       end
     end
-	
-    --Option Recipe
-    --Add the all recipe. No filter applicate yet
-    if optionRecipe and itemSubType == RECIPE_SUBTYPE then
-	  AddObjectlist(fullItemInfo, playerName, 'Recipe')
-    end	
+
+    -- Option Recipe
+    -- Add the recipe regardless (no filter applied yet)
+    if optionRecipe and itemClass == 9 then
+      AddObjectlist(fullItemInfo, playerName, 'Recipe')
+      return
+    end  
 
 	
 	--Option Ilvl Upgrade
@@ -1366,6 +1381,72 @@ end
     print('ERROR: there are no valid names.')
   end
 end)
+
+
+  -- -- Check if playerfullname is nil or empty
+  -- if playerfullname == nil or playerfullname == "" then
+    -- print("playerfullname == nil")
+	-- if not message:find(localizedLootText) then
+      -- print("Le message ne contient pas 'Butin' (ou sa traduction locale)")
+      -- local spacedMessage = {}
+      -- -- Remplir le tableau avec chaque lettre du message
+      -- for i = 1, #message do
+        -- local char = message:sub(i, i) -- Obtenir le caractère à la position i
+        -- table.insert(spacedMessage, char) -- Ajouter le caractère au tableau
+      -- end
+
+      -- -- Joindre les caractères avec un espace
+      -- local finalMessage = table.concat(spacedMessage, " ")
+
+      -- -- Afficher le message final
+      -- print(finalMessage)
+      -- return
+    -- end
+    -- -- Check if the message starts with "[" and contains "] : ", and if the end of the message is an item link
+    -- if message:find("]|h|r : ") and message:find("%(") then
+	  -- print("Bon message")
+      -- -- Extract the player name without the server name
+      -- local playerwithoutservername = message:match("]|h|r : (.+)%s*%(") -- Retrieve the player name
+      -- -- Extract the item link
+      -- local itemlink = message:match("|c%x+|H(.+)|h%[(.+)%]|h|r$") -- Extracts the item link
+
+      -- -- Store both variables in the LootRollWinners table
+      -- if not LootRollWinners[playerwithoutservername] then
+        -- LootRollWinners[playerwithoutservername] = {}
+      -- end
+      
+      -- table.insert(LootRollWinners[playerwithoutservername], itemlink)
+
+    -- else
+	  -- for i = 1, #message do
+        -- print(i, message:sub(i, i), string.byte(message, i))
+      -- end
+      -- return -- Exit if conditions are not met
+    -- end
+
+  -- else
+    -- -- Check if playerfullname can find a matching name in LootRollWinners
+    -- for playerName, items in pairs(LootRollWinners) do
+      -- if playerfullname:find(playerName) then -- Check if the full name matches a player
+        -- for index, item in ipairs(items) do
+          -- if item then
+            -- -- Trigger the WinnerFound event for each matching item
+            -- EventManager:Fire(E.WinnerFound,playerfullname, item)
+            -- -- Remove the item from the list after processing it
+            -- table.remove(items, index)
+            -- break -- Exit the loop once the item is processed to avoid index issues
+          -- end
+        -- end
+        -- return -- Exit once a match is found
+      -- end
+    -- end
+
+    -- return -- Exit if no match was found
+  -- end
+
+
+--EventManager:On(E.WinnerFound, function(playerName, itemLink)
+--end)
 
 ------------------------------------------------------------------------------------
 ------------------------- NEWOBJECTLIST EVENT --------------------------------------
