@@ -1,6 +1,6 @@
 local ADDON_NAME, Addon = ...
 local FonctionButton = Addon:GetModule("FonctionButton")
-
+local SavedVariables = Addon:GetModule("SavedVariables")
 
 --[[ FUNCTIONS FIRED WHEN USER CLICKS BUTTON ON THE SCREEN ]]
 
