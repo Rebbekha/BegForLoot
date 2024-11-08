@@ -420,7 +420,6 @@ local function GetFullItemInfo(item)
   -- Special cases for Mounts/Pets/Recipes
   local itemClass = fullItemInfo[FII_CLASS]
   local itemSubClass = fullItemInfo[FII_SUB_CLASS]
-  local itemID = tonumber(string.match(item, "item:(%d+)"))
 
   -- Check for mounts, pets and recipes using classID and subclassID
   if (itemClass == 15 and itemSubClass == 5) or         -- Mount
@@ -498,6 +497,7 @@ local function IsTradeable(fullItemInfo)
   
   -- Vérification de l'objet lié au compte/bataillon
   if fullItemInfo[FII_IS_BOUND_TO_ACCOUNT] then
+    print("Lié au compte")
     return false
   end
 
@@ -507,6 +507,7 @@ local function IsTradeable(fullItemInfo)
   elseif fullItemInfo[FII_BIND_TYPE] == 2 and not noTradeBindOnEquip then
     return true
   else
+  print(fullItemInfo[FII_BIND_TYPE])
     return false
   end
 end
@@ -797,6 +798,32 @@ function PrintTable(tbl, indent)
     end
 end
 
+local function PrintFullItemInfo(fullItemInfo)
+    if fullItemInfo == nil then
+        print("FullItemInfo is nil.")
+        return
+    end
+
+    print("Item:", fullItemInfo[FII_ITEM])
+    print("Quality:", fullItemInfo[FII_QUALITY])
+    print("Base iLvl:", fullItemInfo[FII_BASE_ILVL])
+    print("Required Level:", fullItemInfo[FII_REQUIRED_LEVEL])
+    print("Item Equip Loc:", fullItemInfo[FII_ITEM_EQUIP_LOC])
+    print("Class:", fullItemInfo[FII_CLASS])
+    print("Sub Class:", fullItemInfo[FII_SUB_CLASS])
+    print("Bind Type:", fullItemInfo[FII_BIND_TYPE])
+    print("Is Equippable:", fullItemInfo[FII_IS_EQUIPPABLE])
+    -- print("Real iLvl:", fullItemInfo[FII_REAL_ILVL])
+    -- print("Classes Allowed:", fullItemInfo[FII_CLASSES])
+    -- print("Trade Time Warning Shown:", fullItemInfo[FII_TRADE_TIME_WARNING_SHOWN])
+    -- print("Has Socket:", fullItemInfo[FII_HAS_SOCKET])
+    -- print("Has Avoidance:", fullItemInfo[FII_HAS_AVOIDANCE])
+    -- print("Has Indestructible:", fullItemInfo[FII_HAS_INDESTRUCTIBLE])
+    -- print("Has Leech:", fullItemInfo[FII_HAS_LEECH])
+    -- print("Has Speed:", fullItemInfo[FII_HAS_SPEED])
+    print("Xmoggable:", fullItemInfo[FII_XMOGGABLE])
+    
+end 
 local Booleendebug = false
 if Booleendebug then
   local function SimulateNewItemAddition()
@@ -1133,10 +1160,9 @@ end)
 
 -- Registering the CHAT_MSG_LOOT event
 EventManager:On("CHAT_MSG_LOOT", function(message, playerName, ...)
-  --print("CHAT_MSG_LOOT")
+  
   -- Check if lootListening is active
   if not lootListening then 
-  --print( "lootListening = false")
   return end
 
   -- Check if the player is fully loaded : uselful for player with low config
@@ -1149,26 +1175,24 @@ EventManager:On("CHAT_MSG_LOOT", function(message, playerName, ...)
   if not GroupLoot then
     return -- Exit we don't want to whisper the winner of the group loot
   end
-
-  --The message we are looking has the  playerName
+  
+  --The message we are looking has the playerName on the 2nd arg
   if playerName == nil or  playerName == "" then
     return
-    --print("playerName == nil")
   else
-    -- Extract the item link
-	--print("playerName != nil")
-    local itemLink = message:match("|c%x+|H(.+)|h%[(.+)%]|h|r$") -- Extracts the item link
   end		
-
+  
+  -- Extract the item link
+  local itemLink = message:match("|Hitem:%d+:[^|]+|h%[[^%]]+%]|h") -- Extracts the item link
+  print(itemLink)
  -- Get full item information using the GetFullItemInfo function
   local fullItemInfo = GetFullItemInfo(itemLink)
+  --PrintFullItemInfo(fullItemInfo)
   
-  
-  --Check if the item have an ilvl and is tradeable
-  if fullItemInfo == nil then 
-    --print("fulliteminfo is nil") 
-    return
-  end 
+  -- --Check if the item have an ilvl and is tradeable
+  -- if fullItemInfo == nil then  
+    -- return
+  -- end 
 
   -- If the item is not tradeable, exit
   if not IsTradeable(fullItemInfo)then 
