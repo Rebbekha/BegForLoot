@@ -497,7 +497,6 @@ local function IsTradeable(fullItemInfo)
   
   -- Vérification de l'objet lié au compte/bataillon
   if fullItemInfo[FII_IS_BOUND_TO_ACCOUNT] then
-    print("Lié au compte")
     return false
   end
 
@@ -507,7 +506,6 @@ local function IsTradeable(fullItemInfo)
   elseif fullItemInfo[FII_BIND_TYPE] == 2 and not noTradeBindOnEquip then
     return true
   else
-  print(fullItemInfo[FII_BIND_TYPE])
     return false
   end
 end
@@ -614,7 +612,6 @@ local function GetSlotIdFromItemId(itemId, callback)
 end
 
 local function IsItemUsefulForthePlayerSpec(fullItemInfo, characterName, IsPlayer)
-  print("IsItemUsefulForthePlayerSpec characterName" .. characterName)
   local MyCharacterClass
   local MyCharacterSpec
   local characterLevel
@@ -1183,8 +1180,8 @@ EventManager:On("CHAT_MSG_LOOT", function(message, playerName, ...)
   end		
   
   -- Extract the item link
-  local itemLink = message:match("|Hitem:%d+:[^|]+|h%[[^%]]+%]|h") -- Extracts the item link
-  print(itemLink)
+  local itemLink = message:match("(|c%x%x%x%x%x%x%x%x|Hitem:%d+:[^|]+|h%[[^%]]+%]|h|r)")
+  --print(itemLink)
  -- Get full item information using the GetFullItemInfo function
   local fullItemInfo = GetFullItemInfo(itemLink)
   --PrintFullItemInfo(fullItemInfo)
@@ -1218,10 +1215,10 @@ EventManager:On("CHAT_MSG_LOOT", function(message, playerName, ...)
   --Code 
   local myName = UnitName("player") -- Get the name of the current player
   local _, myClass = UnitClass('player')
-  
+  local playerNameInMessage = playerName:match("^(%S+)-?")  
   
   -- The loot is from other
-  if playerName ~= myName then
+  if playerNameInMessage ~= myName then
     -- Retrieve user-selected options from saved variables
     local ilvlUpgrade = SavedVariables:Get().ilvlUpgrade.enabled
     local ilvlBelow = SavedVariables:Get().ilvlUpgrade.value
@@ -1352,7 +1349,7 @@ EventManager:On("CHAT_MSG_LOOT", function(message, playerName, ...)
     end
 
   -- You received a loot
-  elseif playerName == myName then 
+  elseif playerNameInMessage == myName then 
   
     -- Retrieve user-selected options from saved variables
     local neverOffering = SavedVariables:Get().neverOffering
@@ -1371,7 +1368,6 @@ EventManager:On("CHAT_MSG_LOOT", function(message, playerName, ...)
 	
 	--Checking if the player has the transmog
     local HasTransmogItem = C_TransmogCollection.PlayerHasTransmog(itemID)
-	print(fullItemInfo[FII_CLASSES])
     if HasTransmogItem then
       AddObjectlist(fullItemInfo, playerName, 'Offer Item')
 	  return
@@ -1386,72 +1382,6 @@ EventManager:On("CHAT_MSG_LOOT", function(message, playerName, ...)
     print('ERROR: there are no valid names.')
   end
 end)
-
-
-  -- -- Check if playerfullname is nil or empty
-  -- if playerfullname == nil or playerfullname == "" then
-    -- print("playerfullname == nil")
-	-- if not message:find(localizedLootText) then
-      -- print("Le message ne contient pas 'Butin' (ou sa traduction locale)")
-      -- local spacedMessage = {}
-      -- -- Remplir le tableau avec chaque lettre du message
-      -- for i = 1, #message do
-        -- local char = message:sub(i, i) -- Obtenir le caractère à la position i
-        -- table.insert(spacedMessage, char) -- Ajouter le caractère au tableau
-      -- end
-
-      -- -- Joindre les caractères avec un espace
-      -- local finalMessage = table.concat(spacedMessage, " ")
-
-      -- -- Afficher le message final
-      -- print(finalMessage)
-      -- return
-    -- end
-    -- -- Check if the message starts with "[" and contains "] : ", and if the end of the message is an item link
-    -- if message:find("]|h|r : ") and message:find("%(") then
-	  -- print("Bon message")
-      -- -- Extract the player name without the server name
-      -- local playerwithoutservername = message:match("]|h|r : (.+)%s*%(") -- Retrieve the player name
-      -- -- Extract the item link
-      -- local itemlink = message:match("|c%x+|H(.+)|h%[(.+)%]|h|r$") -- Extracts the item link
-
-      -- -- Store both variables in the LootRollWinners table
-      -- if not LootRollWinners[playerwithoutservername] then
-        -- LootRollWinners[playerwithoutservername] = {}
-      -- end
-      
-      -- table.insert(LootRollWinners[playerwithoutservername], itemlink)
-
-    -- else
-	  -- for i = 1, #message do
-        -- print(i, message:sub(i, i), string.byte(message, i))
-      -- end
-      -- return -- Exit if conditions are not met
-    -- end
-
-  -- else
-    -- -- Check if playerfullname can find a matching name in LootRollWinners
-    -- for playerName, items in pairs(LootRollWinners) do
-      -- if playerfullname:find(playerName) then -- Check if the full name matches a player
-        -- for index, item in ipairs(items) do
-          -- if item then
-            -- -- Trigger the WinnerFound event for each matching item
-            -- EventManager:Fire(E.WinnerFound,playerfullname, item)
-            -- -- Remove the item from the list after processing it
-            -- table.remove(items, index)
-            -- break -- Exit the loop once the item is processed to avoid index issues
-          -- end
-        -- end
-        -- return -- Exit once a match is found
-      -- end
-    -- end
-
-    -- return -- Exit if no match was found
-  -- end
-
-
---EventManager:On(E.WinnerFound, function(playerName, itemLink)
---end)
 
 ------------------------------------------------------------------------------------
 ------------------------- NEWOBJECTLIST EVENT --------------------------------------
