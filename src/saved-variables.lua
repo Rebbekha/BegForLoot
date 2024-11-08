@@ -16,7 +16,7 @@ local function globalDefaults()
   -- Global Option.
   PromoteAddon = true,
   minimapIcon = { hide = false },
-  GroupLoot = true,
+  GroupLoot = false,
   optionMount = true,
   optionPet = true,
   optionRecipe = true,
