@@ -43,7 +43,28 @@ local patchNotes = {
         }
     },
 ]]--
+     {
+        version = "1.1.5",
+        improvements = {
+            "Delete some obsolete conditions on the loot group option"
+	},
+        bugs = {
+	},
+	features ={ 
+	}
+    },
 
+     {
+        version = "1.1.4",
+        improvements = {
+            "Clean some legacy code"
+	},
+        bugs = {
+	    "Fixed the Loot group option"
+	},
+	features ={
+	}
+    },
      {
         version = "1.1.3",
         improvements = {
