@@ -43,102 +43,113 @@ local patchNotes = {
         }
     },
 ]]--
-     {
-        version = "1.1.5",
-        improvements = {
-            "Delete some obsolete conditions on the loot group option"
-	},
-        bugs = {
-	},
-	features ={ 
-	}
+{
+    version = "1.1.6",
+    improvements = {
+        
     },
-
-     {
-        version = "1.1.4",
-        improvements = {
-            "Clean some legacy code"
-	},
-        bugs = {
-	    "Fixed the Loot group option"
-	},
-	features ={
-	}
+    bugs = {
+        "Fixed a bug where the player’s name was not recognized."
     },
-     {
-        version = "1.1.3",
-        improvements = {
-            "Clean some legacy code"
-	},
-        bugs = {
-	},
-	features ={
-	   "Delete the toy option (it's only for 1-2 bosses and the api isn't friendly"
-	}
-    },
-
-     {
-        version = "1.1.2",
-        improvements = {
-            "Clean some legacy code"
-	},
-        bugs = {
-	    "Fixed the Pet/mount/toy/recipe option"
-	},
-	features ={
-	}
-    },
-     {
-        version = "1.1.1",
-        improvements = {
-            "Clean some legacy code"
-	},
-        bugs = {
-	   "Fixed the Loot Group Roll bug"
-	},
-	features ={
-	}
-    },
-     {
-        version = "1.1.0",
-        improvements = {
-            "Clean some legacy code"
-	},
-        bugs = {},
-	features ={
-            "Add the Promote the Addon option",
-            "Add the Loot Group Roll option",
-            "Add the Pet/Toy/Mount/Recipe option"
-	}
-    },
-     {
-        version = "1.0.2",
-        improvements = {},
-        bugs = {
-            "Fixed issue with the display of the option frame."
-        },
-	features ={}
-    },
-     {
-        version = "1.0.1",
-        improvements = {
-            "Update the list of commands of the minimap icon"
-        },
-        bugs = {
-            "Fixed issue with the display of the option frame.",
-            "Resolved issue with the english translation.",
-            "Fixed issue of the warband items were considered tradable."
-        },
-	features ={}
-    },
-    {
-        version = "1.0.0",
-        improvements = {},
-        bugs = {},
-        features = {
-            "Initial release with basic functionalities."
-        }
+    features ={ 
     }
+},
+{
+    version = "1.1.5",
+    improvements = {
+        "Removed obsolete conditions in the loot group option."
+    },
+    bugs = {
+    },
+    features ={ 
+    }
+},
+
+{
+    version = "1.1.4",
+    improvements = {
+        "Cleaned up some legacy code."
+    },
+    bugs = {
+        "Fixed an issue with the loot group option."
+    },
+    features ={
+    }
+},
+{
+    version = "1.1.3",
+    improvements = {
+        "Cleaned up some legacy code."
+    },
+    bugs = {
+    },
+    features ={
+       "Removed the toy option (it only applies to 1-2 bosses and the API isn’t user-friendly)."
+    }
+},
+
+{
+    version = "1.1.2",
+    improvements = {
+        "Cleaned up some legacy code."
+    },
+    bugs = {
+        "Fixed issues with the pet/mount/toy/recipe options."
+    },
+    features ={
+    }
+},
+{
+    version = "1.1.1",
+    improvements = {
+        "Cleaned up some legacy code."
+    },
+    bugs = {
+       "Fixed the loot group roll bug."
+    },
+    features ={
+    }
+},
+{
+    version = "1.1.0",
+    improvements = {
+        "Cleaned up some legacy code."
+    },
+    bugs = {},
+    features ={
+        "Added the option to promote the addon.",
+        "Added the loot group roll option.",
+        "Added options for pet, toy, mount, and recipe."
+    }
+},
+{
+    version = "1.0.2",
+    improvements = {},
+    bugs = {
+        "Fixed an issue with the display of the options frame."
+    },
+    features ={}
+},
+{
+    version = "1.0.1",
+    improvements = {
+        "Updated the list of commands for the minimap icon."
+    },
+    bugs = {
+        "Fixed an issue with the display of the options frame.",
+        "Resolved an issue with the English translation.",
+        "Fixed an issue where warband items were incorrectly considered tradable."
+    },
+    features ={}
+},
+{
+    version = "1.0.0",
+    improvements = {},
+    bugs = {},
+    features = {
+        "Initial release with basic functionalities."
+    }
+}
 }
 
 local function CreateOptionsPanel()
