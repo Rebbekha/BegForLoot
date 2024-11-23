@@ -39,6 +39,7 @@ local FII_REAL_ILVL					= 'REAL_ILVL'					-- real ilvl, derived from tooltip
 local FII_CLASSES					= 'CLASSES'						-- uppercase string of classes that can use the item (ex: tier); nil if item is not class-restricted
 local FII_TRADE_TIME_WARNING_SHOWN  = 'TRADE_TIME_WARNING_SHOWN'	-- true if the 'You may trade this item...' text is in the tooltip
 local FII_HAS_SOCKET				= 'HAS_SOCKET'					-- true if the item has a socket
+local FII_PRIMARY_STAT 				= 'PRIMARY_STAT'				-- Strength or Intellect or Agility
 local FII_HAS_AVOIDANCE				= 'HAS_AVOIDANCE'				-- true if the item has avoidance
 local FII_HAS_INDESTRUCTIBLE		= 'HAS_INDESTRUCTIBLE'			-- true if the item has indestructible
 local FII_HAS_LEECH					= 'HAS_LEECH'					-- true if the item has leech
@@ -417,75 +418,89 @@ local function GetFullItemInfo(item)
     -- Récupération des informations de base
     _, _, fullItemInfo[FII_QUALITY], fullItemInfo[FII_BASE_ILVL], fullItemInfo[FII_REQUIRED_LEVEL], fullItemInfo[FII_TYPE], fullItemInfo[FII_SUB_TYPE], _, fullItemInfo[FII_ITEM_EQUIP_LOC], _, _, fullItemInfo[FII_CLASS], fullItemInfo[FII_SUB_CLASS], fullItemInfo[FII_BIND_TYPE], _, _, _ = GetItemInfo(item)
   
-  -- Special cases for Mounts/Pets/Recipes
-  local itemClass = fullItemInfo[FII_CLASS]
-  local itemSubClass = fullItemInfo[FII_SUB_CLASS]
+    -- Cas spéciaux pour montures, familiers et recettes
+    local itemClass = fullItemInfo[FII_CLASS]
+    local itemSubClass = fullItemInfo[FII_SUB_CLASS]
 
-  -- Check for mounts, pets and recipes using classID and subclassID
-  if (itemClass == 15 and itemSubClass == 5) or         -- Mount
-    (itemClass == 17 and itemSubClass == 2) or         -- Pet
-    (itemClass == 9) then                                -- Recipe          
-    return fullItemInfo -- Return here as no further information is needed for these subtypes
-  end
-
-  -- Détection si l'objet est équipable
-  fullItemInfo[FII_IS_EQUIPPABLE] = IsEquippableItem(item)
-
-  if fullItemInfo[FII_IS_EQUIPPABLE] then
-    -- Configurer le tooltip pour détecter les valeurs supplémentaires
-    tooltipLong = tooltipLong or CreateFrame("GameTooltip", "BFLScanTooltip", nil, "GameTooltipTemplate")
-    tooltipLong:SetOwner(WorldFrame, "ANCHOR_NONE")
-    tooltipLong:ClearLines()
-    tooltipLong:SetHyperlink(item)
-    tooltipLong.leftside = {}
-    local i = 1
-    while _G["BFLScanTooltipTextLeft" .. i] do
-      tooltipLong.leftside[i] = _G["BFLScanTooltipTextLeft" .. i]
-      i = i + 1
+    if (itemClass == 15 and itemSubClass == 5) or -- Monture
+       (itemClass == 17 and itemSubClass == 2) or -- Familier
+       (itemClass == 9) then                     -- Recette
+      return fullItemInfo -- Retour immédiat
     end
 
-    local realILVL = GetILVLFromTooltip(tooltipLong) or fullItemInfo[FII_BASE_ILVL] fullItemInfo[FII_REAL_ILVL] = tonumber(realILVL)
+    -- Détection si l'objet est équipable
+    fullItemInfo[FII_IS_EQUIPPABLE] = IsEquippableItem(item)
 
-    local classes, hasBindTradeTimeWarning, hasSocket, hasAvoidance, hasIndestructible, hasLeech, hasSpeed, xmoggable, isBoundToAccount = nil, nil, false, false, false, false, false, false, false
-
-    local text
-    local index = 4
-    while tooltipLong.leftside[index] do
-      text = tooltipLong.leftside[index]:GetText()
-                
-      if text ~= nil then
-        -- Recherche des mots-clés pour les liaisons au compte
-        if text:find(ITEM_BIND_TO_ACCOUNT_PATTERN) or text:find(ITEM_BIND_TO_ACCOUNT_UNTIL_EQUIP_PATTERN) or text:find(ITEM_BIND_TO_BNETACCOUNT_PATTERN) or text:find(ITEM_BNETACCOUNTBOUND_PATTERN) then
-          isBoundToAccount = true
-        end
-
-        hasBindTradeTimeWarning = hasBindTradeTimeWarning or text:match(BIND_TRADE_TIME_REMAINING_PATTERN)
-        classes = classes or text:match(ITEM_CLASSES_ALLOWED_PATTERN)
-        hasSocket = hasSocket or text:find(_G.EMPTY_SOCKET_PRISMATIC) == 1
-        hasAvoidance = hasAvoidance or text:find(_G.STAT_AVOIDANCE) ~= nil
-        hasIndestructible = hasIndestructible or text:find(_G.STAT_STURDINESS) == 1
-        hasLeech = hasLeech or text:find(_G.STAT_LIFESTEAL) ~= nil
-        hasSpeed = hasSpeed or text:find(_G.STAT_SPEED) ~= nil
-        xmoggable = xmoggable or text:find(TRANSMOGRIFY_TOOLTIP_APPEARANCE_UNKNOWN_PATTERN) ~= nil
+    if fullItemInfo[FII_IS_EQUIPPABLE] then
+      -- Configurer le tooltip pour récupérer des informations supplémentaires
+      tooltipLong = tooltipLong or CreateFrame("GameTooltip", "BFLScanTooltip", nil, "GameTooltipTemplate")
+      tooltipLong:SetOwner(WorldFrame, "ANCHOR_NONE")
+      tooltipLong:ClearLines()
+      tooltipLong:SetHyperlink(item)
+      tooltipLong.leftside = {}
+      local i = 1
+      while _G["BFLScanTooltipTextLeft" .. i] do
+        tooltipLong.leftside[i] = _G["BFLScanTooltipTextLeft" .. i]
+        i = i + 1
       end
-      index = index + 1
-    end
 
-    if classes ~= nil then
-      classes = string.upper(classes)
-      classes = string.gsub(classes, ' ', '')
-    end
+      local realILVL = GetILVLFromTooltip(tooltipLong) or fullItemInfo[FII_BASE_ILVL]
+      fullItemInfo[FII_REAL_ILVL] = tonumber(realILVL)
 
-    -- Ajout des informations de liaison et des caractéristiques
-    fullItemInfo[FII_CLASSES] = classes
-    fullItemInfo[FII_TRADE_TIME_WARNING_SHOWN] = hasBindTradeTimeWarning
-    fullItemInfo[FII_HAS_SOCKET] = hasSocket
-    fullItemInfo[FII_HAS_AVOIDANCE] = hasAvoidance
-    fullItemInfo[FII_HAS_INDESTRUCTIBLE] = hasIndestructible
-    fullItemInfo[FII_HAS_LEECH] = hasLeech
-    fullItemInfo[FII_HAS_SPEED] = hasSpeed
-    fullItemInfo[FII_XMOGGABLE] = xmoggable
-    fullItemInfo[FII_IS_BOUND_TO_ACCOUNT] = isBoundToAccount  -- Détection de l'objet lié au compte
+      -- Détecter des caractéristiques comme Force, Intelligence, Agilité
+      local stats = C_Item.GetItemStats(item)
+      if stats then
+        for stat, value in pairs(stats) do
+          if stat == "ITEM_MOD_STRENGTH_SHORT" then
+            fullItemInfo[FII_PRIMARY_STAT] = "Strength"
+          elseif stat == "ITEM_MOD_INTELLECT_SHORT" then
+            fullItemInfo[FII_PRIMARY_STAT] = "Intellect"
+          elseif stat == "ITEM_MOD_AGILITY_SHORT" then
+            fullItemInfo[FII_PRIMARY_STAT] = "Agility"
+          end
+        end
+      end
+
+      local classes, hasBindTradeTimeWarning, hasSocket, hasAvoidance, hasIndestructible, hasLeech, hasSpeed, xmoggable, isBoundToAccount = nil, nil, false, false, false, false, false, false, false
+
+      local text
+      local index = 4
+      while tooltipLong.leftside[index] do
+        text = tooltipLong.leftside[index]:GetText()
+                
+        if text ~= nil then
+          -- Recherche des mots-clés pour les liaisons au compte
+          if text:find(ITEM_BIND_TO_ACCOUNT_PATTERN) or text:find(ITEM_BIND_TO_ACCOUNT_UNTIL_EQUIP_PATTERN) or text:find(ITEM_BIND_TO_BNETACCOUNT_PATTERN) or text:find(ITEM_BNETACCOUNTBOUND_PATTERN) then
+            isBoundToAccount = true
+          end
+
+          hasBindTradeTimeWarning = hasBindTradeTimeWarning or text:match(BIND_TRADE_TIME_REMAINING_PATTERN)
+          classes = classes or text:match(ITEM_CLASSES_ALLOWED_PATTERN)
+          hasSocket = hasSocket or text:find(_G.EMPTY_SOCKET_PRISMATIC) == 1
+          hasAvoidance = hasAvoidance or text:find(_G.STAT_AVOIDANCE) ~= nil
+          hasIndestructible = hasIndestructible or text:find(_G.STAT_STURDINESS) == 1
+          hasLeech = hasLeech or text:find(_G.STAT_LIFESTEAL) ~= nil
+          hasSpeed = hasSpeed or text:find(_G.STAT_SPEED) ~= nil
+          xmoggable = xmoggable or text:find(TRANSMOGRIFY_TOOLTIP_APPEARANCE_UNKNOWN_PATTERN) ~= nil
+        end
+        index = index + 1
+      end
+
+      if classes ~= nil then
+        classes = string.upper(classes)
+        classes = string.gsub(classes, ' ', '')
+      end
+
+      -- Ajout des informations supplémentaires
+      fullItemInfo[FII_CLASSES] = classes
+      fullItemInfo[FII_TRADE_TIME_WARNING_SHOWN] = hasBindTradeTimeWarning
+      fullItemInfo[FII_HAS_SOCKET] = hasSocket
+      fullItemInfo[FII_HAS_AVOIDANCE] = hasAvoidance
+      fullItemInfo[FII_HAS_INDESTRUCTIBLE] = hasIndestructible
+      fullItemInfo[FII_HAS_LEECH] = hasLeech
+      fullItemInfo[FII_HAS_SPEED] = hasSpeed
+      fullItemInfo[FII_XMOGGABLE] = xmoggable
+      fullItemInfo[FII_IS_BOUND_TO_ACCOUNT] = isBoundToAccount
     end
   end
 
@@ -508,18 +523,6 @@ local function IsTradeable(fullItemInfo)
   else
     return false
   end
-end
-
-local function GetItemPrimaryAttribute(item)
-  local stats = GetItemStats(item)
-  if stats ~= nil then
-    for stat, value in pairs(stats) do
-      if _G[stat] == ITEM_MOD_STRENGTH_SHORT or _G[stat] == ITEM_MOD_INTELLECT_SHORT or _G[stat] == ITEM_MOD_AGILITY_SHORT then
-        return _G[stat]
-      end
-    end
-  end
-  return nil
 end
 
 local function GetSlotIdFromItemId(itemId, callback)
@@ -615,7 +618,7 @@ local function IsItemUsefulForthePlayerSpec(fullItemInfo, characterName, IsPlaye
   local MyCharacterClass
   local MyCharacterSpec
   local characterLevel
-  if fullItemInfo ~= nil and characterName ~= nil and fullItemInfo[FII_IS_EQUIPPABLE] then
+  if fullItemInfo[FII_REAL_ILVL] ~= nil and characterName ~= nil and fullItemInfo[FII_IS_EQUIPPABLE] then
     if IsPlayer then
       _, MyCharacterClass = UnitClass('player')
       MyCharacterSpec = GetSpecializationInfo(GetSpecialization())
@@ -643,7 +646,7 @@ local function IsItemUsefulForthePlayerSpec(fullItemInfo, characterName, IsPlaye
       return true
     end
 
-      local itemPrimaryAttribute = GetItemPrimaryAttribute(fullItemInfo[FII_ITEM])
+      local itemPrimaryAttribute = fullItemInfo[FII_PRIMARY_STAT]
       if itemPrimaryAttribute ~= nil then
         local isValidPrimaryAttribute = false
         for _, spec in pairs(SPEC_BY_CLASS[MyCharacterClass]) do
@@ -1382,9 +1385,5 @@ EventManager:On("CHAT_MSG_LOOT", function(message, playerName, ...)
     print('ERROR: there are no valid names.')
   end
 end)
-
-------------------------------------------------------------------------------------
-------------------------- NEWOBJECTLIST EVENT --------------------------------------
-------------------------------------------------------------------------------------
 
 
