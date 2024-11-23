@@ -35,7 +35,7 @@ local patchNotes = {
             "Add new language (French)."
         },
         bugs = {
-            "Fixed several minor bugs.",
+            "Fixed the issue with the GetItemStats",
             "Resolved issue with incorrect loot display."
         },
         features = {
@@ -43,6 +43,18 @@ local patchNotes = {
         }
     },
 ]]--
+{
+    version = "1.1.7",
+    improvements = {
+        
+    },
+    bugs = {
+        "Fixed the issue with the GetItemStats(method deprecated with the new update)."
+    },
+    features ={ 
+    }
+},
+
 {
     version = "1.1.6",
     improvements = {
